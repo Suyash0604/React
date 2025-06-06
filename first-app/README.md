@@ -1,12 +1,40 @@
-# React + Vite
+# React Task Manager
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, **dark-themed task manager** built with React, Tailwind CSS, and Nano ID.  
+Easily create and delete tasks with a clean, responsive UI.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## Expanding the ESLint configuration
+- Create tasks with unique IDs using Nano ID
+- View and delete pending tasks
+- Fully responsive and accessible
+- Dark mode design with elegant glassmorphism effect
+- Built with React functional components and hooks
+- Styled with Tailwind CSS for rapid UI development
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+---
+
+## Demo
+
+![Screenshot](image.png)  
+*(Add a screenshot of your app here)*
+
+---
+
+## Technologies Used
+
+- React 18
+- Tailwind CSS (with dark mode enabled)
+- Nano ID (for unique task IDs)
+
+---
+
+## Installation
+
+1. **Clone the repository:**
+
+```bash
+git clone https://github.com/yourusername/react-task-manager.git
+cd react-task-manager
