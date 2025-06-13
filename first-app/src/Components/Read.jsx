@@ -1,9 +1,11 @@
 import React from 'react';
+import { toast } from 'react-toastify';
 
 const Read = ({ tasks, setTasks }) => {
   const deleteHandler = (id) => {
     const newArr = tasks.filter((task) => task.id !== id);
     setTasks(newArr);
+    toast.error("To Do deleted")
   };
 
   return (
