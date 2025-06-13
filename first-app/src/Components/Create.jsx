@@ -26,7 +26,7 @@ const Create = ({ tasks, setTasks }) => {
         <input
           type="text"
           placeholder="Enter title of the task"
-          {...register("title", { required: "Task title is required",maxLength: 10 })}
+          {...register("title", { required: "Task title is required",maxLength: 20 })}
           className="bg-gray-900 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         {errors?.title?.message? <span className="text-red-400 font-xl">Title is required</span> :""}
