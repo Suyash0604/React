@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { toast } from 'react-toastify';
+import { todoContext } from '../Wrapper';
 
-const Read = ({ tasks, setTasks }) => {
+const Read = () => {
+  const [tasks,setTasks] = useContext(todoContext);
   const deleteHandler = (id) => {
     const newArr = tasks.filter((task) => task.id !== id);
     setTasks(newArr);

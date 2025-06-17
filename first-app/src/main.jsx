@@ -1,9 +1,10 @@
 import { createRoot } from "react-dom/client";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import App from "./App.jsx";
 import "./index.css";
+import Wrapper from "./Wrapper.jsx";
 createRoot(document.getElementById("root")).render(
-  <>
+  <Wrapper>
     <App />
     <ToastContainer
       position="top-center"
@@ -17,5 +18,5 @@ createRoot(document.getElementById("root")).render(
       pauseOnHover
       theme="dark"
     />
-  </>
+  </Wrapper>
 );

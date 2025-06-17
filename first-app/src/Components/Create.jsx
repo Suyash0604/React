@@ -1,13 +1,16 @@
-import React, { useState } from "react";
+
 import { nanoid } from 'nanoid';
+import { useContext } from 'react';
 import { useForm } from "react-hook-form"
 import { toast } from "react-toastify";
+import { todoContext } from '../Wrapper';
 
-const Create = ({ tasks, setTasks }) => {
+const Create = () => {
+  const [tasks,setTasks] = useContext(todoContext);
   const {
     register,
     handleSubmit,
-    reset,
+    reset, 
     formState: { errors },
   } = useForm();
 
@@ -18,7 +21,7 @@ const Create = ({ tasks, setTasks }) => {
     toast.success("Todo Created!")
     reset();
   };
-  
+  console.log(errors);
   return (
     <div className="bg-gray-800 p-6 rounded-xl shadow-xl backdrop-blur-md border border-gray-700">
       <h2 className="text-xl font-semibold text-indigo-300 mb-4">Create Task</h2>
@@ -30,6 +33,8 @@ const Create = ({ tasks, setTasks }) => {
           className="bg-gray-900 text-white border border-gray-600 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
         {errors?.title?.message? <span className="text-red-400 font-xl">Title is required</span> :""}
+        {errors?.title?.type == "maxLength" ? <span>Max length reached</span>:""}
+
         <button
           type="submit"
           className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg transition"
