@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useInventory } from "../context/InventoryContext";
 import formImage from "../assets/image2-removebg-preview.png";
+import { nanoid } from "nanoid";
 
 const Add = ({ onClose, editableProduct }) => {
   const { addProduct, editProduct } = useInventory();
@@ -25,20 +26,27 @@ const Add = ({ onClose, editableProduct }) => {
 
   const formHandler = (data) => {
     if (editableProduct) {
-  editProduct(data);
-  onClose();  
-  } else {
-  addProduct(data);
-  onClose();
-  reset();
-  }
+      editProduct(data);
+      onClose();
+    } else {
+      data.id = nanoid();
+      addProduct(data);
+      onClose();
+      reset();
+    }
   };
 
   return (
     <div className="bg-zinc-900 rounded-xl  w-full flex items-center justify-around">
-      <img src={formImage} alt="form" className="w-[400px] h-[550px] cover rounded-2xl" />
-      <form onSubmit={handleSubmit(formHandler)} className="flex flex-wrap gap-5 w-[40%]">
-        
+      <img
+        src={formImage}
+        alt="form"
+        className="w-[400px] h-[550px] cover rounded-2xl"
+      />
+      <form
+        onSubmit={handleSubmit(formHandler)}
+        className="flex flex-wrap gap-5 w-[40%]"
+      >
         <input
           placeholder="Product Name"
           {...register("title", { required: true })}

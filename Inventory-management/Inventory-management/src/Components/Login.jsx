@@ -17,7 +17,7 @@ const Login = ({ setUser }) => {
       });
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
-      navigate("/");
+      navigate("/products");
     // eslint-disable-next-line no-unused-vars
     } catch (err) {
       alert("Login failed");
