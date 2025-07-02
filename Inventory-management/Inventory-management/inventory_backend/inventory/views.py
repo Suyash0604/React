@@ -54,3 +54,17 @@ class LoginView(APIView):
                 "user": UserSerializer(user).data
             })
         return Response(serializer.errors, status=400)
+    
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import CustomUser
+from .serializers import UserSerializer
+from rest_framework.permissions import IsAuthenticated
+
+class UserListView(APIView):
+    permission_classes = [IsAuthenticated]  # Only allow logged in users
+
+    def get(self, request):
+        users = CustomUser.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)

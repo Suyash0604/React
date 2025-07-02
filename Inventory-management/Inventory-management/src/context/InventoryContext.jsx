@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const InventoryContext = createContext();
 // eslint-disable-next-line react-refresh/only-export-components
@@ -24,6 +25,7 @@ export const InventoryProvider = ({ children }) => {
   const deleteProduct = async (id) => {
     try {
       await axios.delete(`http://127.0.0.1:8000/api/inventory/${id}/`);
+      toast.error("Deleted!");
       fetchInventory();
     } catch (error) {
       console.error("Error deleting:", error);
@@ -33,6 +35,7 @@ export const InventoryProvider = ({ children }) => {
   const editProduct = async (updatedItem) => {
     try {
       await axios.put(`http://127.0.0.1:8000/api/inventory/${updatedItem.id}/`, updatedItem);
+      toast.success("Edited!");
       fetchInventory();
     } catch (error) {
       console.error("Error editing:", error);
@@ -42,6 +45,7 @@ export const InventoryProvider = ({ children }) => {
   const addProduct = async (newItem) => {
     try {
       await axios.post("http://127.0.0.1:8000/api/inventory/", newItem);
+      toast.success("Added!");
       fetchInventory();
     } catch (error) {
       console.error("Error adding:", error);

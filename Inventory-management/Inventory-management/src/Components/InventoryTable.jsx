@@ -50,7 +50,7 @@ const InventoryTable = () => {
         </CSVLink>
       </div>
 
-      <table className="w-full text-left border-collapse">
+      <table className="w-full border-1  text-left border-collapse">
         <thead>
           <tr className="bg-zinc-800">
             <th className="p-3">Title</th>

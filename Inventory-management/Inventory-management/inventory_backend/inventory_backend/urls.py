@@ -25,5 +25,6 @@ router.register(r'inventory', InventoryItemViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),        
-    path('api/login/', LoginView.as_view()),    
+    path('api/login/', LoginView.as_view()),  
+     path('api/', include('inventory.urls')),  
 ]

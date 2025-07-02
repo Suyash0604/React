@@ -18,7 +18,7 @@ const Login = ({ setUser }) => {
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
       navigate("/products");
-    // eslint-disable-next-line no-unused-vars
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       alert("Login failed");
     }
@@ -26,14 +26,20 @@ const Login = ({ setUser }) => {
 
   return (
     <div className="w-screen h-screen bg-zinc-900 flex items-center justify-center">
-      <div className="w-[90%] max-w-6xl h-[80%] bg-zinc-800 rounded-2xl shadow-xl flex items-center justify-around p-8">
-        <img src={formImage} className="h-[40rem] cover hidden md:block" alt="Login visual" />
+      <div className="w-[90%] max-w-6xl h-[80%] bg-zinc-800 rounded-4xl shadow-xl flex items-center justify-around p-8">
+        <img
+          src={formImage}
+          className="h-[40rem] cover hidden md:block"
+          alt="Login visual"
+        />
 
         <form
           onSubmit={handleLogin}
-          className="bg-zinc-900 text-white p-10 rounded-2xl shadow-lg w-full max-w-sm flex flex-col gap-5"
+          className="bg-zinc-900 text-white p-10 rounded-4xl shadow-lg w-full max-w-sm flex flex-col gap-6"
         >
-          <h2 className="text-3xl font-bold text-center text-indigo-400">Login</h2>
+          <h2 className="text-3xl font-bold text-center text-indigo-400">
+            Login
+          </h2>
 
           <input
             value={username}
@@ -52,7 +58,7 @@ const Login = ({ setUser }) => {
 
           <button
             type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 transition px-4 py-2 rounded text-white font-semibold"
+            className="bg-indigo-600 hover:bg-indigo-700 transition px-4 py-2 cursor:pointer rounded text-white font-semibold"
           >
             Log In
           </button>
