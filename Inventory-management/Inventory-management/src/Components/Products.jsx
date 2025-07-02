@@ -61,18 +61,22 @@ const Products = ({ user }) => {
                 <p><span className="text-white font-medium">Date:</span> {product.Date}</p>
               </div>
               <div className="flex gap-3 mt-4">
-                <button
+                {user.role === 'admin' && (
+                  <button
                   onClick={() => deleteProduct(product.id)}
                   className="text-sm px-4 py-2 rounded bg-red-600 text-white font-semibold hover:bg-red-700 transition"
                 >
                   Delete
                 </button>
-                <button
+                )}
+                {user.role === 'admin' && (
+                  <button
                   onClick={() => handleEdit(product)}
                   className="text-sm px-4 py-2 rounded bg-yellow-400 text-black font-semibold hover:bg-yellow-500 transition"
                 >
                   Edit
                 </button>
+                )}
               </div>
             </div>
           ))}

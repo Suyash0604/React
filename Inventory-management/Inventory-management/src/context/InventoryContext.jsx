@@ -2,12 +2,12 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 
 const InventoryContext = createContext();
+// eslint-disable-next-line react-refresh/only-export-components
 export const useInventory = () => useContext(InventoryContext);
 
 export const InventoryProvider = ({ children }) => {
   const [inventory, setInventory] = useState([]);
 
-  // Fetch data from Django API
   const fetchInventory = async () => {
     try {
       const res = await axios.get("http://127.0.0.1:8000/api/inventory/");
