@@ -4,7 +4,7 @@ import Add from "./Add";
 import { useInventory } from "../context/InventoryContext";
 
 
-const Products = () => {
+const Products = ({ user }) => {
   const { inventory, deleteProduct } = useInventory();
   const [showForm, setShowForm] = useState(false);
   const [editableProduct, setEditableProduct] = useState(null);
@@ -23,15 +23,18 @@ const Products = () => {
     <div className="text-white px-4 sm:px-[10%] py-10">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h1 className="text-3xl font-bold">Products</h1>
-        <button
-          onClick={() => {
-            setEditableProduct(null);
-            setShowForm(!showForm);
-          }}
-          className="p-3 rounded bg-indigo-600 hover:bg-indigo-700 font-bold flex items-center gap-2 text-white"
-        >
-          <RiAddFill /> {editableProduct ? "Edit Product" : "Add Product"}
-        </button>
+        {user.role === "admin" && (
+  <button
+    onClick={() => {
+      setEditableProduct(null);
+      setShowForm(!showForm);
+    }}
+    className="p-3 rounded bg-indigo-600 hover:bg-indigo-700 font-bold flex items-center gap-2 text-white"
+  >
+    <RiAddFill /> Add Product
+  </button>
+)}
+
       </div>
 
       {showForm && (

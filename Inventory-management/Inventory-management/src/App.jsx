@@ -1,14 +1,19 @@
-import React from 'react'
+import React, { useState } from "react";
+import Nav from "./Components/Nav";
+import Mainroutes from "./routes/Mainroutes";
+import Login from "./Components/Login";
 
-import Nav from './Components/Nav';
-import Mainroutes from './routes/Mainroutes';
 const App = () => {
-  return (
-    <div className='py-5  bg-zinc-700 w-screen min-h-screen'>
-      <Nav/>
-      <Mainroutes/>
-    </div>
-  )
-}
+  const [user, setUser] = useState(null);
 
-export default App
+  if (!user) return <Login setUser={setUser} />;
+
+  return (
+    <div className="bg-black min-h-screen">
+      <Nav user={user} />
+      <Mainroutes user={user} />
+    </div>
+  );
+};
+
+export default App;

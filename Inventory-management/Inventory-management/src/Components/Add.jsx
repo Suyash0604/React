@@ -1,11 +1,10 @@
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { nanoid } from "nanoid";
 import { useInventory } from "../context/InventoryContext";
 import formImage from "../assets/image2-removebg-preview.png";
 
 const Add = ({ onClose, editableProduct }) => {
-  const { setInventory, editProduct } = useInventory();
+  const { addProduct, editProduct } = useInventory();
   const {
     register,
     handleSubmit,
@@ -26,13 +25,13 @@ const Add = ({ onClose, editableProduct }) => {
 
   const formHandler = (data) => {
     if (editableProduct) {
-      editProduct(data);
-    } else {
-      data.id = nanoid();
-      setInventory((prev) => [...prev, data]);
-    }
-    reset();
-    onClose(); 
+  editProduct(data);
+  onClose();  
+  } else {
+  addProduct(data);
+  onClose();
+  reset();
+  }
   };
 
   return (

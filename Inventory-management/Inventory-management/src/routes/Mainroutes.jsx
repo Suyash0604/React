@@ -4,11 +4,11 @@ import Products from '../Components/Products.jsx';
 
 import Alerts from "../Components/Alerts.jsx";
 import InventoryTable from "../Components/InventoryTable.jsx";
-const Mainroutes = () => {
+const Mainroutes = ({ user }) => {
   return (
     <Routes>
         <Route path='/' element={<Home/>}></Route>
-        <Route path='/products' element={<Products/>}></Route>
+        <Route path='/products' element={<Products user={user} />}></Route>
         <Route path='/alerts' element={<Alerts/>}></Route>
         <Route path="/reports" element={<InventoryTable/>}></Route>
       </Routes>
