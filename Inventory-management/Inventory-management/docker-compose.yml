@@ -1,0 +1,33 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./inventory_backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./inventory_backend:/app
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+    ports:
+      - "4173:4173"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: inventory_mg_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Pass@123
+    ports:
+      - "5432:5432"

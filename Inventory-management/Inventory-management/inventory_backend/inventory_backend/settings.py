@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-ghuovv#lq-4#%yga@f+jkb1$41ymas=&mz3&jqtpu)ani$rwj!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -61,7 +61,7 @@ DATABASES = {
         'NAME': 'inventory_mg_db',
         'USER': 'postgres',
         'PASSWORD': 'Pass@123',
-        'HOST': 'localhost',
+        'HOST': 'db',
         'PORT': '5432',
     }
 }
