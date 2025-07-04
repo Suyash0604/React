@@ -29,9 +29,9 @@ const InventoryTable = () => {
     { label: "Date", key: "Date" },
   ];
 
-  return (
-    <div className="text-white px-4 sm:px-[10%] py-10">
-      <div className="flex justify-between items-center mb-4 flex-wrap gap-3">
+  return (  
+    <div className="text-white px-4 sm:px-[10%] py-10"> 
+      <div className="flex justify-between items-center mb-4 flex -wrap gap-3">
         <input
           type="text"
           placeholder="Search by product title..."

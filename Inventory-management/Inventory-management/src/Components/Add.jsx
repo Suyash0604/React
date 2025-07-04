@@ -3,9 +3,12 @@ import { useForm } from "react-hook-form";
 import { useInventory } from "../context/InventoryContext";
 import formImage from "../assets/image2-removebg-preview.png";
 import { nanoid } from "nanoid";
-
+import axios from "axios";
+import { useState } from "react";
 const Add = ({ onClose, editableProduct }) => {
   const { addProduct, editProduct } = useInventory();
+  const [suppliers, setSuppliers] = useState([]);
+  const token = localStorage.getItem("token");
   const {
     register,
     handleSubmit,
@@ -14,6 +17,21 @@ const Add = ({ onClose, editableProduct }) => {
     formState: { errors },
   } = useForm();
 
+  useEffect(() => {
+    // fetch suppliers from backend
+    const fetchSuppliers = async () => {
+      try {
+        const res = await axios.get("http://localhost:8000/api/suppliers/", {
+          headers: { Authorization: `Token ${token}` },
+        });
+        setSuppliers(res.data);
+      } catch (error) {
+        console.error("Error fetching suppliers:", error);
+      }
+    };
+
+    fetchSuppliers();
+  }, []);
   useEffect(() => {
     if (editableProduct) {
       Object.entries(editableProduct).forEach(([key, value]) => {
@@ -69,11 +87,18 @@ const Add = ({ onClose, editableProduct }) => {
           {...register("Price", { required: true })}
           className="w-full p-3 bg-zinc-800 text-white  rounded"
         />
-        <input
-          placeholder="Supplier"
+        <select
           {...register("supplier", { required: true })}
-          className="w-full p-3 bg-zinc-800 text-white  rounded"
-        />
+          className="w-full p-3 bg-zinc-800 text-white rounded"
+        >
+          <option value="">Select Supplier</option>
+          {suppliers.map((supplier) => (
+            <option key={supplier.id} value={supplier.name}>
+              {supplier.name}
+            </option>
+          ))}
+        </select>
+
         <input
           type="date"
           {...register("Date", { required: true })}

@@ -4,6 +4,9 @@ import Products from '../Components/Products.jsx';
 
 import Alerts from "../Components/Alerts.jsx";
 import InventoryTable from "../Components/InventoryTable.jsx";
+import Register from "../Components/Register.jsx";
+import AddSupplier from "../Components/AddSupplier.jsx";
+import ViewSuppliers from "../Components/ViewSuppliers.jsx";
 const Mainroutes = ({ user }) => {
   return (
     <Routes>
@@ -11,6 +14,9 @@ const Mainroutes = ({ user }) => {
         <Route path='/products' element={<Products user={user} />}></Route>
         <Route path='/alerts' element={<Alerts/>}></Route>
         <Route path="/reports" element={<InventoryTable/>}></Route>
+        <Route path="/register" element={<Register/>} />
+        <Route path="/add-supplier" element={<AddSupplier user={user} />} />
+        <Route path="/view-suppliers" element={<ViewSuppliers user={user} />} />
       </Routes>
   )
 }

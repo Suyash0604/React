@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";  // ✅ Import Link
 import formImage from "../assets/imageee.png";
 
-const Login = ({ setUser }) => {
+const Login = ({ user,setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -17,8 +17,8 @@ const Login = ({ setUser }) => {
       });
       localStorage.setItem("token", res.data.token);
       setUser(res.data.user);
-      navigate("/products");
-      // eslint-disable-next-line no-unused-vars
+      navigate("/products"); 
+      
     } catch (err) {
       alert("Login failed");
     }
@@ -62,6 +62,14 @@ const Login = ({ setUser }) => {
           >
             Log In
           </button>
+
+          {/* ✅ Add link to register */}
+          <p className="text-center text-sm mt-2 text-zinc-400">
+            Don't have an account?{" "}
+            <Link to="/register" className="text-indigo-400 underline hover:text-indigo-300">
+              Register here
+            </Link>
+          </p>
         </form>
       </div>
     </div>
