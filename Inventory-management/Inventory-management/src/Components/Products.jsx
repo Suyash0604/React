@@ -32,19 +32,42 @@ const Products = ({ user }) => {
   };
 
   const applyFilters = async () => {
-    try {
-      const params = new URLSearchParams(filters).toString();
-      const res = await axios.get(
-        `http://localhost:8000/api/inventory/?${params}`,
-        {
-          headers: { Authorization: `Token ${localStorage.getItem("token")}` },
-        }
-      );
-      setInventory(res.data);
-    } catch (err) {
-      console.error("Error applying filters", err);
+  try {
+    // 1. Clean empty filters
+    const cleanFilters = Object.fromEntries(
+      Object.entries(filters).filter(([_, v]) => v !== "")
+    );
+
+    // 2. Build query string
+    const params = new URLSearchParams(cleanFilters).toString();
+    console.log("✅ Filter query string:", params);
+
+    // 3. Get token safely
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("❌ No token found in localStorage");
+      return;
     }
-  };
+
+    // 4. Send request
+    const res = await axios.get(
+      `http://localhost:8000/api/inventory/?${params}`,
+      {
+        headers: {
+          Authorization: `Token ${token}`, // ✅ Ensure this is sent
+        },
+      }
+    );
+
+    // 5. Update inventory
+    console.log("✅ Filtered products received:", res.data);
+    setInventory(res.data);
+
+  } catch (err) {
+    console.error("❌ Error applying filters:", err.response?.data || err.message);
+  }
+};
+
 
   useEffect(() => {
     fetchSuppliers();
@@ -53,7 +76,7 @@ const Products = ({ user }) => {
   const handleEdit = (product) => {
     setEditableProduct(product);
     setShowForm(true);
-  };
+  };  
 
   const handleCloseForm = () => {
     setShowForm(false);
@@ -144,34 +167,38 @@ const Products = ({ user }) => {
           {inventory.map((product) => (
             <div
               key={product.id}
-              className="bg-zinc-800 border border-zinc-700 rounded-xl p-6 shadow-md flex flex-col gap-2"
+              className="bg-zinc-800 border w-fit border-zinc-700 rounded-xl p-6 shadow-md flex flex-col gap-2"
             >
               <h2 className="text-xl font-semibold">{product.title}</h2>
               <div className="flex flex-wrap gap-4 text-gray-300 text-sm">
                 <p>
-                  <span className="text-white font-medium">SKU:</span>{" "}
-                  {product.SKU}
-                </p>
-                <p>
-                  <span className="text-white font-medium">Quantity:</span>{" "}
-                  {product.Quantity}
-                </p>
-                <p>
                   <span className="text-white font-medium">Price:</span> ₹
-                  {product.Price}
+                  {product.price}
                 </p>
                 <p>
                   <span className="text-white font-medium">Supplier:</span>{" "}
                   {product.supplier}
                 </p>
-                <p>
-                  <span className="text-white font-medium">Created:</span>{" "}
-                  {new Date(product.created_at).toLocaleString()}
-                </p>
-                <p>
-                  <span className="text-white font-medium">Updated:</span>{" "}
-                  {new Date(product.updated_at).toLocaleString()}
-                </p>
+                {user.role === "admin" && (
+                  <>
+                    <p>
+                      <span className="text-white font-medium">SKU:</span>{" "}
+                      {product.SKU}
+                    </p>
+                    <p>
+                      <span className="text-white font-medium">Quantity:</span>{" "}
+                      {product.Quantity}
+                    </p>
+                    <p>
+                      <span className="text-white font-medium">Created:</span>{" "}
+                      {new Date(product.created_at).toLocaleString()}
+                    </p>
+                    <p>
+                      <span className="text-white font-medium">Updated:</span>{" "}
+                      {new Date(product.updated_at).toLocaleString()}
+                    </p>
+                  </>
+                )}
               </div>
               <div className="flex gap-3 mt-4">
                 {user.role === "admin" && (

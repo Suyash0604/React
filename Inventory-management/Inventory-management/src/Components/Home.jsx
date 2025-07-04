@@ -9,7 +9,7 @@ const Home = () => {
   const lowStockItems = inventory.filter((item) => Number(item.Quantity) <= 5).length;
 
   const totalStockValue = inventory.reduce(
-    (acc, item) => acc + Number(item.Quantity) * Number(item.Price),
+    (acc, item) => acc + Number(item.Quantity) * Number(item.price),
     0
   );
 

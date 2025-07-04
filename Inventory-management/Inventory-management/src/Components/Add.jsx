@@ -84,7 +84,7 @@ const Add = ({ onClose, editableProduct }) => {
         <input
           type="number"
           placeholder="Price"
-          {...register("Price", { required: true })}
+          {...register("price", { required: true })}
           className="w-full p-3 bg-zinc-800 text-white  rounded"
         />
         <select

@@ -33,7 +33,7 @@ const App = () => {
 
   // Only show Nav when user is logged in
   return (
-    <div className="bg-black min-h-screen">
+    <div className="bg-black min-h-screen min-w-screen">
       {user && <Nav user={user} setUser={setUser} />}
       <Routes>
         {!user ? (
