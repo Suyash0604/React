@@ -60,9 +60,19 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 from rest_framework import serializers
 from .models import Supplier
+from .models import Sale
 
 class SupplierSerializer(serializers.ModelSerializer):
     class Meta:
         model = Supplier
         fields = '__all__'
 
+class SaleSerializer(serializers.ModelSerializer):
+    total_price = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Sale
+        fields = ['id', 'product', 'quantity', 'organization', 'address', 'timestamp', 'total_price']
+
+    def get_total_price(self, obj):
+        return obj.total_price()

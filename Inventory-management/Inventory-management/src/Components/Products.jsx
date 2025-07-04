@@ -3,11 +3,13 @@ import { RiAddFill } from "@remixicon/react";
 import Add from "./Add";
 import { useInventory } from "../context/InventoryContext";
 import axios from "axios";
+import BuyProduct from "./BuyProduct";
 
 const Products = ({ user }) => {
   const { inventory, deleteProduct, setInventory } = useInventory();
   const [showForm, setShowForm] = useState(false);
   const [editableProduct, setEditableProduct] = useState(null);
+  const [buyProduct, setBuyProduct] = useState(null);
 
   const [filters, setFilters] = useState({
     scheme: "",
@@ -32,42 +34,43 @@ const Products = ({ user }) => {
   };
 
   const applyFilters = async () => {
-  try {
-    // 1. Clean empty filters
-    const cleanFilters = Object.fromEntries(
-      Object.entries(filters).filter(([_, v]) => v !== "")
-    );
+    try {
+      // 1. Clean empty filters
+      const cleanFilters = Object.fromEntries(
+        Object.entries(filters).filter(([_, v]) => v !== "")
+      );
 
-    // 2. Build query string
-    const params = new URLSearchParams(cleanFilters).toString();
-    console.log("✅ Filter query string:", params);
+      // 2. Build query string
+      const params = new URLSearchParams(cleanFilters).toString();
+      console.log("✅ Filter query string:", params);
 
-    // 3. Get token safely
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("❌ No token found in localStorage");
-      return;
-    }
-
-    // 4. Send request
-    const res = await axios.get(
-      `http://localhost:8000/api/inventory/?${params}`,
-      {
-        headers: {
-          Authorization: `Token ${token}`, // ✅ Ensure this is sent
-        },
+      // 3. Get token safely
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("❌ No token found in localStorage");
+        return;
       }
-    );
 
-    // 5. Update inventory
-    console.log("✅ Filtered products received:", res.data);
-    setInventory(res.data);
+      // 4. Send request
+      const res = await axios.get(
+        `http://localhost:8000/api/inventory/?${params}`,
+        {
+          headers: {
+            Authorization: `Token ${token}`, // ✅ Ensure this is sent
+          },
+        }
+      );
 
-  } catch (err) {
-    console.error("❌ Error applying filters:", err.response?.data || err.message);
-  }
-};
-
+      // 5. Update inventory
+      console.log("✅ Filtered products received:", res.data);
+      setInventory(res.data);
+    } catch (err) {
+      console.error(
+        "❌ Error applying filters:",
+        err.response?.data || err.message
+      );
+    }
+  };
 
   useEffect(() => {
     fetchSuppliers();
@@ -76,7 +79,7 @@ const Products = ({ user }) => {
   const handleEdit = (product) => {
     setEditableProduct(product);
     setShowForm(true);
-  };  
+  };
 
   const handleCloseForm = () => {
     setShowForm(false);
@@ -98,6 +101,7 @@ const Products = ({ user }) => {
             <RiAddFill /> Add Product
           </button>
         )}
+        
       </div>
 
       {/* Filter Section */}
@@ -179,6 +183,15 @@ const Products = ({ user }) => {
                   <span className="text-white font-medium">Supplier:</span>{" "}
                   {product.supplier}
                 </p>
+                {user.role === "user" && (
+                  <button
+                    className="text-sm px-4 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+                    onClick={() => setBuyProduct(product)}
+                  >
+                    Buy
+                  </button>
+                )}
+                
                 {user.role === "admin" && (
                   <>
                     <p>
@@ -200,6 +213,7 @@ const Products = ({ user }) => {
                   </>
                 )}
               </div>
+              
               <div className="flex gap-3 mt-4">
                 {user.role === "admin" && (
                   <>
@@ -220,6 +234,15 @@ const Products = ({ user }) => {
               </div>
             </div>
           ))}
+          {buyProduct && (
+          <div className="mb-10">
+            <BuyProduct
+              product={buyProduct}
+              onClose={() => setBuyProduct(null)}
+              refreshInventory={applyFilters}
+            />
+          </div>
+        )}
         </div>
       )}
     </div>

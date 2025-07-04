@@ -43,3 +43,16 @@ class Supplier(models.Model):
 
     def __str__(self):
         return self.name
+
+class Sale(models.Model):
+    product = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    organization = models.CharField(max_length=255)
+    address = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def total_price(self):
+        return self.quantity * self.product.price
+
+    def __str__(self):
+        return f"{self.quantity} sold of {self.product.title}"

@@ -172,3 +172,108 @@ class CurrentUserView(APIView):
     
 
 
+from rest_framework import status
+from rest_framework.views import APIView
+from .models import Sale, InventoryItem
+from .serializers import SaleSerializer
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+
+class BuyProductView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        try:
+            product = InventoryItem.objects.get(id=data["product"])
+            qty = int(data["quantity"])
+
+            if qty > product.Quantity:
+                return Response({"error": "Not enough stock"}, status=400)
+
+            # Update product quantity
+            product.Quantity -= qty
+            product.save()
+
+            # Save the sale
+            sale = Sale.objects.create(
+                product=product,
+                quantity=qty,
+                organization=data["organization"],
+                address=data["address"]
+            )
+            serializer = SaleSerializer(sale)
+            return Response(serializer.data, status=201)
+
+        except InventoryItem.DoesNotExist:
+            return Response({"error": "Product not found"}, status=404)
+        except Exception as e:
+            return Response({"error": str(e)}, status=400)
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.db.models import Sum
+from .models import Sale
+from datetime import timedelta
+from django.utils import timezone
+
+@api_view(['GET'])
+def dashboard_stats(request):
+    if not request.user.is_authenticated or request.user.role != 'admin':
+        return Response({"error": "Unauthorized"}, status=403)
+
+    sales_summary = (
+        Sale.objects.values('product__title')
+        .annotate(total_sold=Sum('quantity'))
+        .order_by('-total_sold')
+    )
+
+    total_sold = sales_summary.aggregate(total=Sum('total_sold'))['total'] or 0
+    most_sold = sales_summary[0]['product__title'] if sales_summary else None
+
+    recent = (
+        Sale.objects.select_related("product")
+        .order_by("-timestamp")[:5]
+        .values("product__title", "quantity", "organization", "timestamp")
+    )
+
+    return Response({
+        "total_sold": total_sold,
+        "most_sold_product": most_sold,
+        "recent_purchases": list(recent),
+        "sales_breakdown": list(sales_summary),
+    })
+
+# views.py
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.db.models import Sum
+from .models import Sale
+
+@api_view(['GET'])
+def product_sales_summary(request):
+    if not request.user.is_authenticated or request.user.role != 'admin':
+        return Response({"error": "Unauthorized"}, status=403)
+
+    data = (
+        Sale.objects.values('product__title')
+        .annotate(total_sold=Sum('quantity'))
+        .order_by('-total_sold')
+    )
+    return Response(data)
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Sale
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def clear_all_sales(request):
+    if request.user.role != 'admin':
+        return Response({"error": "Unauthorized"}, status=403)
+
+    Sale.objects.all().delete()
+    return Response({"message": "All sales data cleared successfully."}, status=200)

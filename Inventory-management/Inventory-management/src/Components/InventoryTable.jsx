@@ -68,7 +68,7 @@ const InventoryTable = () => {
               <td className="p-3">{item.title}</td>
               <td className="p-3">{item.SKU}</td>
               <td className="p-3">{item.Quantity}</td>
-              <td className="p-3">₹{item.Price}</td>
+              <td className="p-3">₹{item.price}</td>
               <td className="p-3">{item.supplier}</td>
               <td className="p-3">{item.Date}</td>
               <td className="p-3">

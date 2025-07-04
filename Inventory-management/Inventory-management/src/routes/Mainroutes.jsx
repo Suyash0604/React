@@ -10,7 +10,7 @@ import ViewSuppliers from "../Components/ViewSuppliers.jsx";
 const Mainroutes = ({ user }) => {
   return (
     <Routes>
-        <Route path='/' element={<Home/>}></Route>
+        <Route path='/' element={<Home user={user}/>}></Route>
         <Route path='/products' element={<Products user={user} />}></Route>
         <Route path='/alerts' element={<Alerts/>}></Route>
         <Route path="/reports" element={<InventoryTable/>}></Route>
