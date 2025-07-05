@@ -10,6 +10,7 @@ const Products = ({ user }) => {
   const [showForm, setShowForm] = useState(false);
   const [editableProduct, setEditableProduct] = useState(null);
   const [buyProduct, setBuyProduct] = useState(null);
+  const [showFilters, setShowFilters] = useState(false);
 
   const [filters, setFilters] = useState({
     scheme: "",
@@ -35,40 +36,24 @@ const Products = ({ user }) => {
 
   const applyFilters = async () => {
     try {
-      // 1. Clean empty filters
       const cleanFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) => v !== "")
       );
 
-      // 2. Build query string
       const params = new URLSearchParams(cleanFilters).toString();
-      console.log("✅ Filter query string:", params);
-
-      // 3. Get token safely
       const token = localStorage.getItem("token");
-      if (!token) {
-        console.error("❌ No token found in localStorage");
-        return;
-      }
+      if (!token) return;
 
-      // 4. Send request
       const res = await axios.get(
         `http://localhost:8000/api/inventory/?${params}`,
         {
-          headers: {
-            Authorization: `Token ${token}`, // ✅ Ensure this is sent
-          },
+          headers: { Authorization: `Token ${token}` },
         }
       );
 
-      // 5. Update inventory
-      console.log("✅ Filtered products received:", res.data);
       setInventory(res.data);
     } catch (err) {
-      console.error(
-        "❌ Error applying filters:",
-        err.response?.data || err.message
-      );
+      console.error("❌ Error applying filters:", err.response?.data || err.message);
     }
   };
 
@@ -90,80 +75,87 @@ const Products = ({ user }) => {
     <div className="text-white px-4 sm:px-[10%] py-10">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h1 className="text-3xl font-bold">Products</h1>
-        {user.role === "admin" && (
+
+        <div className="flex gap-3">
           <button
-            onClick={() => {
-              setEditableProduct(null);
-              setShowForm(!showForm);
-            }}
-            className="p-3 rounded bg-indigo-600 hover:bg-indigo-700 font-bold flex items-center gap-2 text-white"
+            onClick={() => setShowFilters(!showFilters)}
+            className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600"
           >
-            <RiAddFill /> Add Product
+            {showFilters ? "Hide Filters" : "Show Filters"}
           </button>
-        )}
-        
+
+          {user.role === "admin" && (
+            <button
+              onClick={() => {
+                setEditableProduct(null);
+                setShowForm(!showForm);
+              }}
+              className="p-3 rounded bg-indigo-600 hover:bg-indigo-700 font-bold flex items-center gap-2 text-white"
+            >
+              <RiAddFill /> Add Product
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Filter Section */}
-      <div className="bg-zinc-800 p-4 rounded-xl mb-10 flex flex-wrap gap-4">
-        <input
-          placeholder="Scheme (SKU or Title)"
-          className="bg-zinc-900 text-white p-2 rounded"
-          onChange={(e) => setFilters({ ...filters, scheme: e.target.value })}
-        />
-        <select
-          className="bg-zinc-900 text-white p-2 rounded"
-          onChange={(e) => setFilters({ ...filters, supplier: e.target.value })}
-        >
-          <option value="">All Suppliers</option>
-          {suppliers.map((s) => (
-            <option key={s.id} value={s.name}>
-              {s.name}
-            </option>
-          ))}
-        </select>
-        <input
-          type="number"
-          placeholder="Min Price"
-          className="bg-zinc-900 text-white p-2 rounded"
-          onChange={(e) =>
-            setFilters({ ...filters, min_price: e.target.value })
-          }
-        />
-        <input
-          type="number"
-          placeholder="Max Price"
-          className="bg-zinc-900 text-white p-2 rounded"
-          onChange={(e) =>
-            setFilters({ ...filters, max_price: e.target.value })
-          }
-        />
-        <input
-          type="date"
-          className="bg-zinc-900 text-white p-2 rounded"
-          onChange={(e) =>
-            setFilters({ ...filters, start_date: e.target.value })
-          }
-        />
-        <input
-          type="date"
-          className="bg-zinc-900 text-white p-2 rounded"
-          onChange={(e) => setFilters({ ...filters, end_date: e.target.value })}
-        />
-        <button
-          onClick={applyFilters}
-          className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600"
-        >
-          Apply Filters
-        </button>
-      </div>
+      {/* Filter Inputs */}
+      {showFilters && (
+        <div className="bg-zinc-800 p-4 rounded-xl mb-10 flex flex-wrap gap-4">
+          <input
+            placeholder="Scheme (SKU or Title)"
+            className="bg-zinc-900 text-white p-2 rounded"
+            onChange={(e) => setFilters({ ...filters, scheme: e.target.value })}
+          />
+          <select
+            className="bg-zinc-900 text-white p-2 rounded"
+            onChange={(e) => setFilters({ ...filters, supplier: e.target.value })}
+          >
+            <option value="">All Suppliers</option>
+            {suppliers.map((s) => (
+              <option key={s.id} value={s.name}>
+                {s.name}
+              </option>
+            ))}
+          </select>
+          <input
+            type="number"
+            placeholder="Min Price"
+            className="bg-zinc-900 text-white p-2 rounded"
+            onChange={(e) => setFilters({ ...filters, min_price: e.target.value })}
+          />
+          <input
+            type="number"
+            placeholder="Max Price"
+            className="bg-zinc-900 text-white p-2 rounded"
+            onChange={(e) => setFilters({ ...filters, max_price: e.target.value })}
+          />
+          <input
+            type="date"
+            className="bg-zinc-900 text-white p-2 rounded"
+            onChange={(e) => setFilters({ ...filters, start_date: e.target.value })}
+          />
+          <input
+            type="date"
+            className="bg-zinc-900 text-white p-2 rounded"
+            onChange={(e) => setFilters({ ...filters, end_date: e.target.value })}
+          />
+          <button
+            onClick={applyFilters}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Apply Filters
+          </button>
+        </div>
+      )}
 
+      {/* Add Product Form */}
       {showForm && (
         <div className="mb-10">
           <Add editableProduct={editableProduct} onClose={handleCloseForm} />
         </div>
       )}
 
+      {/* Product List */}
       {inventory.length === 0 ? (
         <p className="text-gray-400">No products added yet.</p>
       ) : (
@@ -171,36 +163,33 @@ const Products = ({ user }) => {
           {inventory.map((product) => (
             <div
               key={product.id}
-              className="bg-zinc-800 border w-fit border-zinc-700 rounded-xl p-6 shadow-md flex flex-col gap-2"
+              className="bg-zinc-800 border w-full border-zinc-700 rounded-xl p-6 shadow-md flex flex-col gap-2"
             >
               <h2 className="text-xl font-semibold">{product.title}</h2>
               <div className="flex flex-wrap gap-4 text-gray-300 text-sm">
                 <p>
-                  <span className="text-white font-medium">Price:</span> ₹
-                  {product.price}
+                  <span className="text-white font-medium">Price:</span> ₹{product.price}
                 </p>
                 <p>
-                  <span className="text-white font-medium">Supplier:</span>{" "}
-                  {product.supplier}
+                  <span className="text-white font-medium">Supplier:</span> {product.supplier}
                 </p>
+                <p>
+                  <span className="text-white font-medium">Quantity:</span> {product.Quantity}
+                </p>
+
                 {user.role === "user" && (
                   <button
                     className="text-sm px-4 py-2 rounded bg-green-600 text-white font-semibold hover:bg-green-700 transition"
-                    onClick={() => setBuyProduct(product)}
+                    onClick={() => setBuyProduct({ ...product })}
                   >
                     Buy
                   </button>
                 )}
-                
+
                 {user.role === "admin" && (
                   <>
                     <p>
-                      <span className="text-white font-medium">SKU:</span>{" "}
-                      {product.SKU}
-                    </p>
-                    <p>
-                      <span className="text-white font-medium">Quantity:</span>{" "}
-                      {product.Quantity}
+                      <span className="text-white font-medium">SKU:</span> {product.SKU}
                     </p>
                     <p>
                       <span className="text-white font-medium">Created:</span>{" "}
@@ -213,7 +202,7 @@ const Products = ({ user }) => {
                   </>
                 )}
               </div>
-              
+
               <div className="flex gap-3 mt-4">
                 {user.role === "admin" && (
                   <>
@@ -234,15 +223,17 @@ const Products = ({ user }) => {
               </div>
             </div>
           ))}
+
+          {/* Buy Product Modal */}
           {buyProduct && (
-          <div className="mb-10">
-            <BuyProduct
-              product={buyProduct}
-              onClose={() => setBuyProduct(null)}
-              refreshInventory={applyFilters}
-            />
-          </div>
-        )}
+            <div className="mb-10">
+              <BuyProduct
+                product={buyProduct}
+                onClose={() => setBuyProduct(null)}
+                refreshInventory={applyFilters}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>

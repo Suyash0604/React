@@ -1,67 +1,46 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { useCart } from "../context/CartContext";
 
-const BuyProduct = ({ product, onClose, refreshInventory }) => {
-  const [organization, setOrganization] = useState("");
-  const [address, setAddress] = useState("");
+const BuyProduct = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const { addToCart } = useCart();
 
-  const totalPrice = (quantity && product?.price) ? (quantity * product.price).toFixed(2) : "0.00";
+  // Debug log to verify which product is rendering
+  console.log("🛒 Rendering BuyProduct for:", product?.title);
 
-  const handleBuy = async () => {
+  const totalPrice =
+    quantity && product?.price
+      ? (quantity * parseFloat(product.price)).toFixed(2)
+      : "0.00";
+
+  const handleAddToCart = () => {
     setError("");
-    setSuccess("");
 
-    if (!organization || !address || !quantity || quantity < 1) {
-      setError("Please fill all fields with valid values.");
+    if (quantity < 1) {
+      setError("Please enter a valid quantity.");
       return;
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "http://localhost:8000/api/buy/",
-        {
-          product: product.id,
-          quantity,
-          organization,
-          address,
-        },
-        {
-          headers: {
-            Authorization: `Token ${token}`,
-          },
-        }
-      );
-
-      setSuccess("Purchase successful!");
-      refreshInventory(); // Refetch inventory to update quantity
-      onClose(); // Close form
-    } catch (err) {
-      setError(err.response?.data?.error || "Purchase failed.");
+    if (quantity > product.Quantity) {
+      setError("Quantity exceeds available stock.");
+      return;
     }
+
+    addToCart({
+      product: { ...product, price: parseFloat(product.price) }, // force number
+      quantity,
+      totalPrice: parseFloat(product.price) * quantity,
+    });
+
+    onClose(); // Close the modal
   };
 
   return (
     <div className="bg-zinc-800 p-6 rounded-xl mb-6 w-fit">
-      <h2 className="text-xl font-semibold mb-4">Buy {product.title}</h2>
+      <h2 className="text-xl font-semibold mb-4">Buy {product?.title}</h2>
 
       <div className="flex flex-col gap-4">
-        <input
-          type="text"
-          placeholder="Organization Name"
-          value={organization}
-          onChange={(e) => setOrganization(e.target.value)}
-          className="bg-zinc-900 text-white p-2 rounded"
-        />
-        <textarea
-          placeholder="Address"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          className="bg-zinc-900 text-white p-2 rounded"
-        />
         <input
           type="number"
           placeholder="Quantity"
@@ -69,21 +48,20 @@ const BuyProduct = ({ product, onClose, refreshInventory }) => {
           onChange={(e) => setQuantity(parseInt(e.target.value))}
           className="bg-zinc-900 text-white p-2 rounded"
           min={1}
-          max={product.Quantity}
+          max={product?.Quantity}
         />
         <p className="text-white">
           <span className="font-semibold">Total Price: </span> ₹{totalPrice}
         </p>
 
         {error && <p className="text-red-400">{error}</p>}
-        {success && <p className="text-green-400">{success}</p>}
 
         <div className="flex gap-4">
           <button
-            onClick={handleBuy}
+            onClick={handleAddToCart}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
           >
-            Confirm Purchase
+            Add to Cart
           </button>
           <button
             onClick={onClose}

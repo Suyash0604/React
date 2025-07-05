@@ -7,9 +7,15 @@ import InventoryTable from "../Components/InventoryTable.jsx";
 import Register from "../Components/Register.jsx";
 import AddSupplier from "../Components/AddSupplier.jsx";
 import ViewSuppliers from "../Components/ViewSuppliers.jsx";
+
+import CartPage from "../Components/CartPage";
+import BillPage from "../Components/BillPage";
+import MyBills from "../Components/MyBills.jsx";
 const Mainroutes = ({ user }) => {
   return (
     <Routes>
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/bill/:billId" element={<BillPage />} />
         <Route path='/' element={<Home user={user}/>}></Route>
         <Route path='/products' element={<Products user={user} />}></Route>
         <Route path='/alerts' element={<Alerts/>}></Route>
@@ -17,6 +23,7 @@ const Mainroutes = ({ user }) => {
         <Route path="/register" element={<Register/>} />
         <Route path="/add-supplier" element={<AddSupplier user={user} />} />
         <Route path="/view-suppliers" element={<ViewSuppliers user={user} />} />
+        <Route path="/my-bills" element={<MyBills/>} />
       </Routes>
   )
 }

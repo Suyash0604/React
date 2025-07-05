@@ -114,6 +114,7 @@ from .serializers import UserSerializer
 from django.contrib.auth.hashers import make_password
 
 class RegisterView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         data = request.data
         if data.get("password") != data.get("confirm_password"):
@@ -217,31 +218,81 @@ from .models import Sale
 from datetime import timedelta
 from django.utils import timezone
 
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.db.models import Sum
+from .models import Sale, BillItem
+
 @api_view(['GET'])
 def dashboard_stats(request):
     if not request.user.is_authenticated or request.user.role != 'admin':
         return Response({"error": "Unauthorized"}, status=403)
 
-    sales_summary = (
+    # 1. Sales Summary from Sale model
+    sale_summary = (
         Sale.objects.values('product__title')
         .annotate(total_sold=Sum('quantity'))
-        .order_by('-total_sold')
     )
 
-    total_sold = sales_summary.aggregate(total=Sum('total_sold'))['total'] or 0
-    most_sold = sales_summary[0]['product__title'] if sales_summary else None
+    # 2. Sales Summary from BillItem model
+    billitem_summary = (
+        BillItem.objects.values('product__title')
+        .annotate(total_sold=Sum('quantity'))
+    )
 
-    recent = (
+    # 3. Combine summaries into one dictionary
+    combined_summary = {}
+
+    for entry in sale_summary:
+        title = entry['product__title']
+        combined_summary[title] = combined_summary.get(title, 0) + entry['total_sold']
+
+    for entry in billitem_summary:
+        title = entry['product__title']
+        combined_summary[title] = combined_summary.get(title, 0) + entry['total_sold']
+
+    # 4. Convert combined_summary into sorted list of dicts
+    sorted_summary = sorted(
+        [{"product__title": k, "total_sold": v} for k, v in combined_summary.items()],
+        key=lambda x: x["total_sold"],
+        reverse=True
+    )
+
+    total_sold = sum([entry['total_sold'] for entry in sorted_summary])
+    most_sold = sorted_summary[0]['product__title'] if sorted_summary else None
+
+    # 5. Recent purchases from both Sale and BillItem
+    recent_sales = list(
         Sale.objects.select_related("product")
-        .order_by("-timestamp")[:5]
+        .order_by("-timestamp")[:3]
         .values("product__title", "quantity", "organization", "timestamp")
     )
+
+    bill_items = (
+        BillItem.objects.select_related("product", "bill")
+        .order_by("-bill__timestamp")[:3]
+    )
+    recent_bills = [
+        {
+            "product__title": item.product.title,
+            "quantity": item.quantity,
+            "organization": item.bill.organization,
+            "timestamp": item.bill.timestamp,
+        }
+        for item in bill_items
+    ]
+
+    recent_combined = sorted(
+        recent_sales + recent_bills,
+        key=lambda x: x["timestamp"],
+        reverse=True
+    )[:5]
 
     return Response({
         "total_sold": total_sold,
         "most_sold_product": most_sold,
-        "recent_purchases": list(recent),
-        "sales_breakdown": list(sales_summary),
+        "recent_purchases": recent_combined,
+        "sales_breakdown": sorted_summary,
     })
 
 # views.py
@@ -277,3 +328,125 @@ def clear_all_sales(request):
 
     Sale.objects.all().delete()
     return Response({"message": "All sales data cleared successfully."}, status=200)
+
+# views.py
+from .models import Bill, BillItem
+
+class ConfirmPurchaseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        data = request.data
+        items = data.get("items", [])  # list of { product, quantity }
+        organization = data.get("organization")
+        address = data.get("address")
+
+        if not items or not organization or not address:
+            return Response({"error": "Incomplete data"}, status=400)
+
+        bill = Bill.objects.create(user=request.user, organization=organization, address=address)
+
+        for entry in items:
+            try:
+                product = InventoryItem.objects.get(id=entry["product"])
+                qty = int(entry["quantity"])
+
+                if qty > product.Quantity:
+                    bill.delete()  # rollback
+                    return Response({"error": f"Not enough stock for {product.title}"}, status=400)
+
+                product.Quantity -= qty
+                product.save()
+
+                BillItem.objects.create(bill=bill, product=product, quantity=qty)
+
+            except Exception as e:
+                bill.delete()
+                return Response({"error": str(e)}, status=400)
+
+        return Response({"bill_id": bill.id}, status=201)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_bill(request, bill_id):
+    try:
+        bill = Bill.objects.get(id=bill_id, user=request.user)
+        items = bill.items.select_related("product")
+
+        data = {
+            "id": bill.id,
+            "organization": bill.organization,
+            "address": bill.address,
+            "timestamp": bill.timestamp,
+            "items": [
+                {
+                    "title": item.product.title,
+                    "quantity": item.quantity,
+                    "price": float(item.product.price),
+                    "total": float(item.total_price()),
+                }
+                for item in items
+            ],
+            "total_amount": bill.total_amount()
+        }
+        return Response(data)
+
+    except Bill.DoesNotExist:
+        return Response({"error": "Bill not found"}, status=404)
+
+# views.py
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Bill
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def all_bills(request):
+    bills = Bill.objects.filter(user=request.user).order_by("-timestamp")
+    data = [
+        {
+            "id": bill.id,
+            "organization": bill.organization,
+            "address": bill.address,
+            "timestamp": bill.timestamp,
+            "total_amount": bill.total_amount(),
+        }
+        for bill in bills
+    ]
+    return Response(data)
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Bill
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def all_bills_admin(request):
+    if not request.user.is_staff and request.user.role != "admin":
+        return Response({"error": "Not authorized"}, status=403)
+
+    bills = Bill.objects.all().order_by("-timestamp")
+    data = []
+
+    for bill in bills:
+        items = bill.items.select_related("product")
+        data.append({
+            "id": bill.id,
+            "user": bill.user.username,
+            "organization": bill.organization,
+            "address": bill.address,
+            "timestamp": bill.timestamp,
+            "total_amount": bill.total_amount(),
+            "items": [
+                {
+                    "title": item.product.title,
+                    "quantity": item.quantity,
+                    "price": float(item.product.price),
+                    "total": float(item.total_price()),
+                }
+                for item in items
+            ],
+        })
+
+    return Response(data)

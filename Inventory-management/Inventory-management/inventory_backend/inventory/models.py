@@ -56,3 +56,24 @@ class Sale(models.Model):
 
     def __str__(self):
         return f"{self.quantity} sold of {self.product.title}"
+# models.py
+class Bill(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    organization = models.CharField(max_length=255)
+    address = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def total_amount(self):
+        return sum(item.total_price() for item in self.items.all())
+
+    def __str__(self):
+        return f"Bill #{self.id} for {self.user.username}"
+
+
+class BillItem(models.Model):
+    bill = models.ForeignKey(Bill, on_delete=models.CASCADE, related_name="items")
+    product = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+
+    def total_price(self):
+        return self.quantity * self.product.price

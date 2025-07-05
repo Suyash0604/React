@@ -27,7 +27,7 @@ const Nav = ({ user, setUser }) => {
                   <NavLink
                     to="/"
                     className={({ isActive }) =>
-                      isActive ? "underline text-red-400" : ""
+                      isActive ? " text-red-400" : ""
                     }
                   >
                     Dashboard
@@ -35,7 +35,7 @@ const Nav = ({ user, setUser }) => {
                   <NavLink
                     to="/add-supplier"
                     className={({ isActive }) =>
-                      isActive ? "underline text-red-400" : ""
+                      isActive ? " text-red-400" : ""
                     }
                   >
                     Add Supplier
@@ -43,29 +43,43 @@ const Nav = ({ user, setUser }) => {
                   <NavLink
                     to="/view-suppliers"
                     className={({ isActive }) =>
-                      isActive ? "underline text-red-400" : ""
+                      isActive ? " text-red-400" : ""
                     }
                   >
                     View Suppliers
+                  </NavLink>
+                  <NavLink
+                    to="/reports"
+                    className={({ isActive }) =>
+                      isActive ? " text-red-400" : ""
+                    }
+                  >
+                    Reports
                   </NavLink>
                 </>
               )}
               <NavLink
                 to="/products"
                 className={({ isActive }) =>
-                  isActive ? "underline text-red-400" : ""
+                  isActive ? " text-red-400" : ""
                 }
               >
-                Inventory
+                Products
               </NavLink>
-              <NavLink
-                to="/reports"
-                className={({ isActive }) =>
-                  isActive ? "underline text-red-400" : ""
-                }
-              >
-                Reports
-              </NavLink>
+
+              {user?.role === "user" && (
+                <>
+                  <NavLink
+                    to="/cart"
+                    className={({ isActive }) =>
+                      isActive ? " text-red-400" : ""
+                    }
+                  >
+                    🛒 Cart
+                  </NavLink>
+                  <NavLink to="/my-bills">My Bills</NavLink>
+                </>
+              )}
               {user?.role === "admin" && (
                 <NavLink to="/alerts">
                   <button className="text-sm bg-red-600 px-4 py-2 rounded hover:bg-red-700 text-white">
@@ -106,7 +120,7 @@ const Nav = ({ user, setUser }) => {
                   to="/"
                   onClick={() => setIsMenuOpen(false)}
                   className={({ isActive }) =>
-                    isActive ? "underline text-red-400" : ""
+                    isActive ? " text-red-400" : ""
                   }
                 >
                   Dashboard
@@ -115,7 +129,7 @@ const Nav = ({ user, setUser }) => {
                   to="/add-supplier"
                   onClick={() => setIsMenuOpen(false)}
                   className={({ isActive }) =>
-                    isActive ? "underline text-red-400" : ""
+                    isActive ? " text-red-400" : ""
                   }
                 >
                   Add Supplier
@@ -124,7 +138,7 @@ const Nav = ({ user, setUser }) => {
                   to="/view-suppliers"
                   onClick={() => setIsMenuOpen(false)}
                   className={({ isActive }) =>
-                    isActive ? "underline text-red-400" : ""
+                    isActive ? " text-red-400" : ""
                   }
                 >
                   View Suppliers
@@ -135,7 +149,7 @@ const Nav = ({ user, setUser }) => {
               to="/products"
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
-                isActive ? "underline text-red-400" : ""
+                isActive ? " text-red-400" : ""
               }
             >
               Inventory
@@ -144,7 +158,7 @@ const Nav = ({ user, setUser }) => {
               to="/reports"
               onClick={() => setIsMenuOpen(false)}
               className={({ isActive }) =>
-                isActive ? "underline text-red-400" : ""
+                isActive ? " text-red-400" : ""
               }
             >
               Reports

@@ -4,11 +4,14 @@ import App from "./App.jsx";
 import { InventoryProvider } from "./context/InventoryContext";
 import { BrowserRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
+import { CartProvider } from "./context/CartContext.jsx";
 import "./index.css";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <BrowserRouter>
     <InventoryProvider>
-      <App />
+      <CartProvider>
+        <App />
+      </CartProvider>
       <ToastContainer
         position="top-center"
         autoClose={1100}
