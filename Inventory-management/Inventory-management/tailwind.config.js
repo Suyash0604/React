@@ -1,14 +1,6 @@
-// tailwind.config.js
-import scrollbar from 'tailwind-scrollbar'
-
-export default {
-  content: [
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [
-    scrollbar,
-  ],
-}
+export const darkMode = "class";
+export const content = ["./src/**/*.{js,jsx,ts,tsx}"];
+export const theme = {
+  extend: {},
+};
+export const plugins = [];

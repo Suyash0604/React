@@ -222,7 +222,7 @@ const SalesByDate = ({ stats }) => {
   const sortedDates = Object.keys(stats).sort((a, b) => new Date(b) - new Date(a));
 
   return (
-    <div className="bg-zinc-900 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 rounded-xl p-6 shadow-md ">
+    <div className="bg-zinc-900  scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 rounded-xl p-6 shadow-md ">
       <h2 className="text-2xl font-semibold mb-4">📅 Date-wise Sales Details</h2>
       <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
         {sortedDates.map((date) => (
