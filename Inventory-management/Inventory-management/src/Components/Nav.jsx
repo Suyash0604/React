@@ -14,7 +14,7 @@ const Nav = ({ user, setUser }) => {
 
   return (
     <div className="w-screen flex justify-center px-2 overflow-x-hidden">
-      <div className="w-full max-w-[1000px] mt-5 bg-zinc-800 rounded-2xl text-white text-xl px-5 py-3 transition-all duration-200 ease-in font-bold">
+      <div className="w-full max-w-[1000px] mt-5 bg-zinc-800 rounded-2xl text-white text-xl px-3 py-5 transition-all duration-200 ease-in font-bold">
         {/* Top bar */}
         <div className="flex justify-between md:justify-center gap-4 items-center">
           <div className="flex items-center gap-4">

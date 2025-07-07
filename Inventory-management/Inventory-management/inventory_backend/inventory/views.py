@@ -251,24 +251,31 @@ from rest_framework.response import Response
 from django.db.models import Sum
 from .models import Sale, BillItem
 
+from collections import defaultdict
+from django.utils.timezone import localtime
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from django.db.models import Sum
+from .models import Sale, BillItem
+
+from django.utils.timezone import now
+from datetime import timedelta
+
 @api_view(['GET'])
 def dashboard_stats(request):
     if not request.user.is_authenticated or request.user.role != 'admin':
         return Response({"error": "Unauthorized"}, status=403)
 
-    # 1. Sales Summary from Sale model
-    sale_summary = (
-        Sale.objects.values('product__title')
-        .annotate(total_sold=Sum('quantity'))
-    )
+    today = now().date()
 
-    # 2. Sales Summary from BillItem model
-    billitem_summary = (
-        BillItem.objects.values('product__title')
-        .annotate(total_sold=Sum('quantity'))
-    )
+    # Filter today's Sale and BillItem data
+    today_sales = Sale.objects.filter(timestamp__date=today)
+    today_bills = BillItem.objects.filter(bill__timestamp__date=today)
 
-    # 3. Combine summaries into one dictionary
+    # Sum today's quantities
+    sale_summary = today_sales.values('product__title').annotate(total_sold=Sum('quantity'))
+    billitem_summary = today_bills.values('product__title').annotate(total_sold=Sum('quantity'))
+
     combined_summary = {}
 
     for entry in sale_summary:
@@ -279,7 +286,6 @@ def dashboard_stats(request):
         title = entry['product__title']
         combined_summary[title] = combined_summary.get(title, 0) + entry['total_sold']
 
-    # 4. Convert combined_summary into sorted list of dicts
     sorted_summary = sorted(
         [{"product__title": k, "total_sold": v} for k, v in combined_summary.items()],
         key=lambda x: x["total_sold"],
@@ -289,7 +295,7 @@ def dashboard_stats(request):
     total_sold = sum([entry['total_sold'] for entry in sorted_summary])
     most_sold = sorted_summary[0]['product__title'] if sorted_summary else None
 
-    # 5. Recent purchases from both Sale and BillItem
+    # Recent purchases (same as before)
     recent_sales = list(
         Sale.objects.select_related("product")
         .order_by("-timestamp")[:3]
@@ -316,14 +322,35 @@ def dashboard_stats(request):
         reverse=True
     )[:5]
 
+    # Optional: Date-wise data (if used)
+    sales_by_date = {}
+    for sale in today_sales:
+        date_str = sale.timestamp.date().isoformat()
+        sales_by_date.setdefault(date_str, []).append({
+            "product": sale.product.title,
+            "user": sale.user.username,
+            "organization": sale.organization,
+            "timestamp": sale.timestamp,
+            "quantity": sale.quantity,
+        })
+
+    for item in today_bills:
+        date_str = item.bill.timestamp.date().isoformat()
+        sales_by_date.setdefault(date_str, []).append({
+            "product": item.product.title,
+            "user": item.bill.user.username,
+            "organization": item.bill.organization,
+            "timestamp": item.bill.timestamp,
+            "quantity": item.quantity,
+        })
+
     return Response({
         "total_sold": total_sold,
         "most_sold_product": most_sold,
         "recent_purchases": recent_combined,
         "sales_breakdown": sorted_summary,
+        "sales_by_date": sales_by_date,
     })
-
-# views.py
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response

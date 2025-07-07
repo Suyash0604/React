@@ -72,8 +72,8 @@ const Products = ({ user }) => {
   };
 
   return (
-    <div className="text-white px-4 sm:px-[10%] py-10">
-      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+    <div className="text-white px-4 sm:px-[10%] py-10 flex items-center justify-center flex-col">
+      <div className="flex justify-between w-[85%] items-center mb-6 flex-wrap gap-4">
         <h1 className="text-3xl font-bold">Products</h1>
 
         <div className="flex gap-3">
@@ -163,7 +163,7 @@ const Products = ({ user }) => {
           {inventory.map((product) => (
             <div
               key={product.id}
-              className="bg-zinc-800 border w-full border-zinc-700 rounded-xl p-6 shadow-md flex flex-col gap-2"
+              className="bg-zinc-800 border w-[95%] border-zinc-700 rounded-xl p-6 shadow-md flex flex-col gap-2"
             >
               <h2 className="text-xl font-semibold">{product.title}</h2>
               <div className="flex flex-wrap gap-4 text-gray-300 text-sm">
