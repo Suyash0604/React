@@ -11,15 +11,35 @@ from rest_framework import generics
 from .models import InventoryItem
 from .serializers import InventoryItemSerializer
 
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
+from django.db.models import Q
+from .models import InventoryItem
+from .serializers import InventoryItemSerializer
+
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import PermissionDenied
+from django.db.models import Q
+from .models import InventoryItem
+from .serializers import InventoryItemSerializer
+
 class InventoryItemViewSet(viewsets.ModelViewSet):
-    queryset = InventoryItem.objects.all().order_by('-id')
+    queryset = InventoryItem.objects.all()  # ✅ Required by DRF router
     serializer_class = InventoryItemSerializer
-    class InventoryItemViewSet(viewsets.ModelViewSet):
-        serializer_class = InventoryItemSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        queryset = InventoryItem.objects.all()
+        user = self.request.user
 
+        # ✅ Admin sees all, others only their own items
+        if user.role == 'admin':
+            queryset = InventoryItem.objects.all()
+        else:
+            queryset = InventoryItem.objects.filter(owner=user)
+
+        # ✅ Apply filters
         scheme = self.request.query_params.get("scheme")
         if scheme:
             queryset = queryset.filter(Q(title__icontains=scheme) | Q(SKU__icontains=scheme))
@@ -45,7 +65,15 @@ class InventoryItemViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(created_at__date__lte=end_date)
 
         print("✅ ViewSet filter query:", queryset.query)
-        return queryset
+        return queryset.order_by("-id")
+
+    def perform_create(self, serializer):
+        if self.request.user.role != 'admin':
+            raise PermissionDenied("Only admin can add products.")
+        
+        # ✅ `owner` is passed from frontend dropdown (admin selects user)
+        serializer.save()
+
 
 
 @api_view(['GET'])
@@ -337,34 +365,94 @@ class ConfirmPurchaseView(APIView):
 
     def post(self, request):
         data = request.data
-        items = data.get("items", [])  # list of { product, quantity }
+        items = data.get("items", [])
         organization = data.get("organization")
         address = data.get("address")
-
+        
         if not items or not organization or not address:
             return Response({"error": "Incomplete data"}, status=400)
 
-        bill = Bill.objects.create(user=request.user, organization=organization, address=address)
+        total = 0
 
+        # ✅ Step 1: Calculate total without modifying DB
+        for entry in items:
+            try:
+                product = InventoryItem.objects.get(id=entry["product"])
+                qty = int(entry["quantity"])
+                if qty > product.Quantity:
+                    return Response({"error": f"Not enough stock for {product.title}"}, status=400)
+                item_total = qty * float(product.price)
+                total += item_total
+            except Exception as e:
+                return Response({"error": str(e)}, status=400)
+
+        # ✅ Step 2: Determine discount and GST
+        discount_percentage = 0
+        if total > 10000:
+            discount_percentage = 20
+        elif total > 5000:
+            discount_percentage = 15
+        elif total > 2000:
+            discount_percentage = 10
+        elif total > 1000:
+            discount_percentage = 5
+
+        discount_amount = (discount_percentage / 100) * total
+        gst_percentage = 18
+        gst_amount = ((total - discount_amount) * gst_percentage) / 100
+        final_amount = total - discount_amount + gst_amount
+
+        # ✅ Step 3: Create Bill
+        bill = Bill.objects.create(
+            user=request.user,
+            organization=organization,
+            address=address,
+            discount_percentage=discount_percentage,
+            discount_amount=round(discount_amount, 2),
+            gst_percentage=gst_percentage,
+            gst_amount=round(gst_amount, 2)
+        )
+
+        # ✅ Step 4: Create BillItems and update stock
         for entry in items:
             try:
                 product = InventoryItem.objects.get(id=entry["product"])
                 qty = int(entry["quantity"])
 
-                if qty > product.Quantity:
-                    bill.delete()  # rollback
-                    return Response({"error": f"Not enough stock for {product.title}"}, status=400)
-
+                # Update stock
                 product.Quantity -= qty
                 product.save()
 
-                BillItem.objects.create(bill=bill, product=product, quantity=qty)
+                BillItem.objects.create(
+                    bill=bill,
+                    product=product,
+                    quantity=qty,
+                    discount=discount_percentage,
+                    gst=gst_percentage
+                )
 
             except Exception as e:
                 bill.delete()
                 return Response({"error": str(e)}, status=400)
 
-        return Response({"bill_id": bill.id}, status=201)
+        # ✅ Step 5: Return bill summary
+        return Response({
+            "bill_id": bill.id,
+            "original_amount": round(total, 2),
+            "discount_percentage": discount_percentage,
+            "discount_amount": round(discount_amount, 2),
+            "gst_percentage": gst_percentage,
+            "gst_amount": round(gst_amount, 2),
+            "final_amount": round(final_amount, 2)
+        }, status=201)
+
+
+
+
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import Bill
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -375,9 +463,12 @@ def get_bill(request, bill_id):
 
         data = {
             "id": bill.id,
+            "user_name": bill.user.username,  # ✅ Add this line
             "organization": bill.organization,
             "address": bill.address,
             "timestamp": bill.timestamp,
+            "discount_percentage": bill.discount_percentage,
+            "gst_percentage": bill.gst_percentage,
             "items": [
                 {
                     "title": item.product.title,
@@ -389,10 +480,14 @@ def get_bill(request, bill_id):
             ],
             "total_amount": bill.total_amount()
         }
+
         return Response(data)
 
     except Bill.DoesNotExist:
         return Response({"error": "Bill not found"}, status=404)
+
+
+
 
 # views.py
 from rest_framework.decorators import api_view, permission_classes

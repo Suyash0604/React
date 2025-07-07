@@ -37,7 +37,7 @@ const Products = ({ user }) => {
   const applyFilters = async () => {
     try {
       const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([_, v]) => v !== "")
+        Object.entries(filters).filter(([ v]) => v !== "")
       );
 
       const params = new URLSearchParams(cleanFilters).toString();

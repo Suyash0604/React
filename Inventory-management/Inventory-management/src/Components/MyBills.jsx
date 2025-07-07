@@ -27,6 +27,7 @@ const MyBills = () => {
         setLoading(false);
       } catch (err) {
         setError("Failed to fetch bills");
+        console.log(err);
         setLoading(false);
       }
     };
