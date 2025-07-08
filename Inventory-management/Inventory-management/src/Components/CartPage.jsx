@@ -5,10 +5,12 @@ import { useNavigate } from "react-router-dom";
 
 const CartPage = () => {
   const { cart, clearCart } = useCart();
-  const [organization, setOrganization] = useState("");
   const [address, setAddress] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const buyerName = cart[0]?.buyerName || "";
+  const contactNumber = cart[0]?.contactNumber || "";
 
   const total = cart
     .reduce((sum, item) => {
@@ -18,35 +20,46 @@ const CartPage = () => {
     .toFixed(2);
 
   const handleConfirm = async () => {
-    setError("");
-    if (!organization || !address || cart.length === 0) {
-      setError("Fill all fields and add at least one product.");
-      return;
-    }
+  setError("");
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "http://localhost:8000/api/confirm_purchase/",
-        {
-          organization,
-          address,
-          items: cart.map((item) => ({
-            product: item.product?.id || item.id,
-            quantity: item.quantity,
-          })),
-        },
-        {
-          headers: { Authorization: `Token ${token}` },
-        }
-      );
+  if (cart.length === 0) {
+    setError("Your cart is empty.");
+    return;
+  }
 
-      clearCart();
-      navigate(`/bill/${res.data.bill_id}`);
-    } catch (err) {
-      setError(err.response?.data?.error || "Purchase failed");
-    }
-  };
+  const buyerName = cart[0]?.buyerName;
+  const contactNumber = cart[0]?.contactNumber;
+
+  if (!buyerName || !contactNumber || !address.trim()) {
+    setError("Incomplete data");
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+    const res = await axios.post(
+      "http://localhost:8000/api/confirm_purchase/",
+      {
+        buyer_name: buyerName,
+        contact_number: contactNumber,
+        address,
+        items: cart.map((item) => ({
+          product: item.product?.id || item.id,
+          quantity: item.quantity,
+        })),
+      },
+      {
+        headers: { Authorization: `Token ${token}` },
+      }
+    );
+
+    clearCart();
+    navigate(`/bill/${res.data.bill_id}`);
+  } catch (err) {
+    console.error("❌ Error confirming purchase:", err.response?.data || err.message);
+    setError(err.response?.data?.error || "Purchase failed");
+  }
+};
 
   return (
     <div className="p-6 text-white max-w-3xl mx-auto">
@@ -56,6 +69,16 @@ const CartPage = () => {
         <p className="text-gray-400">Your cart is empty.</p>
       ) : (
         <>
+          {/* Buyer Info */}
+          <div className="mb-6 text-sm text-gray-300">
+            <p>
+              👤 <strong>Buyer Name:</strong> {buyerName}
+            </p>
+            <p>
+              📞 <strong>Contact Number:</strong> {contactNumber}
+            </p>
+          </div>
+
           {/* Cart Table */}
           <div className="grid grid-cols-4 gap-4 font-semibold border-b border-gray-500 pb-2 mb-2">
             <span>Product</span>
@@ -67,7 +90,9 @@ const CartPage = () => {
           {cart.map((item, index) => {
             const title = item?.product?.title || item?.title;
             const quantity = item.quantity;
-            const unitPrice = parseFloat(item?.product?.price || item?.price || 0);
+            const unitPrice = parseFloat(
+              item?.product?.price || item?.price || 0
+            );
             const lineTotal = (quantity * unitPrice).toFixed(2);
 
             return (
@@ -78,7 +103,9 @@ const CartPage = () => {
                 <span>{title}</span>
                 <span>{quantity}</span>
                 <span>₹{unitPrice.toFixed(2)}</span>
-                <span className="font-semibold text-green-300">₹{lineTotal}</span>
+                <span className="font-semibold text-green-300">
+                  ₹{lineTotal}
+                </span>
               </div>
             );
           })}
@@ -88,17 +115,10 @@ const CartPage = () => {
             <span className="text-white">Total: ₹{total}</span>
           </div>
 
-          {/* Organization Info */}
+          {/* Address Only */}
           <div className="mt-6 space-y-3">
-            <input
-              type="text"
-              placeholder="Organization Name"
-              value={organization}
-              onChange={(e) => setOrganization(e.target.value)}
-              className="bg-zinc-900 p-3 rounded w-full outline-none"
-            />
             <textarea
-              placeholder="Address"
+              placeholder="Delivery Address"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="bg-zinc-900 p-3 rounded w-full outline-none"

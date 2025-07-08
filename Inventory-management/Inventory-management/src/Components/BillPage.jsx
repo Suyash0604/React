@@ -38,7 +38,6 @@ const BillPage = () => {
 
   if (!bill) return <p style={{ color: "#fff", padding: "2rem" }}>Loading...</p>;
 
-  // ✅ Correct calculations
   const subtotal = bill.items?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
   const gstAmount = (subtotal * (bill.gst_percentage || 0)) / 100;
   const discountAmount = ((subtotal + gstAmount) * (bill.discount_percentage || 0)) / 100;
@@ -73,8 +72,8 @@ const BillPage = () => {
         <div style={{ marginBottom: "1rem", display: "flex", justifyContent: "space-between", flexWrap: "wrap" }}>
           <div style={{ flex: 1, minWidth: "220px" }}>
             <h3 style={{ fontWeight: "600", marginBottom: "6px" }}>Billed To</h3>
-            <p style={{ margin: "4px 0" }}><strong>Name:</strong> {bill.user_name}</p>
-            <p style={{ margin: "4px 0" }}><strong>Organization:</strong> {bill.organization}</p>
+            <p style={{ margin: "4px 0" }}><strong>Name:</strong> {bill.buyer_name}</p>
+            <p style={{ margin: "4px 0" }}><strong>Contact:</strong> {bill.contact_number}</p>
             <p style={{ margin: "4px 0" }}><strong>Address:</strong> {bill.address}</p>
           </div>
         </div>

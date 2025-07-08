@@ -40,7 +40,6 @@ const Home = ({ user }) => {
 
   return (
     <div className="flex flex-col gap-10 mt-10 px-4 sm:px-[10%] py-10 text-white">
-
       {/* ✅ First row with image and stats cards */}
       <div className="flex flex-col lg:flex-row justify-center items-stretch gap-8">
         {/* 📦 Image on the left */}
@@ -72,9 +71,7 @@ const Home = ({ user }) => {
               <Card title="Bills Created" value={userPurchases.length} colorClass="text-green-400" />
               <Card
                 title="Total Spent"
-                value={`₹${userPurchases
-                  .reduce((sum, b) => sum + b.total_amount, 0)
-                  .toFixed(2)}`}
+                value={`₹${userPurchases.reduce((sum, b) => sum + b.total_amount, 0).toFixed(2)}`}
                 colorClass="text-pink-400"
               />
             </>
@@ -107,7 +104,7 @@ const Home = ({ user }) => {
                   className="bg-zinc-800 border border-zinc-700 rounded-xl p-4 shadow"
                 >
                   <p className="text-lg font-semibold">Bill #{bill.id}</p>
-                  <p className="text-sm text-gray-300">Organization: {bill.organization}</p>
+                  <p className="text-sm text-gray-300">Buyer: {bill.buyer_name}</p>
                   <p className="text-sm text-gray-300">Amount: ₹{bill.total_amount.toFixed(2)}</p>
                   <p className="text-sm text-gray-400">
                     {new Date(bill.timestamp).toLocaleString()}
@@ -147,7 +144,7 @@ const RecentPurchases = ({ salesStats, setSalesStats }) => (
           >
             <p className="font-semibold text-white">🛒 {sale.product__title}</p>
             <p className="text-sm text-yellow-300">Qty: {sale.quantity}</p>
-            <p className="text-sm text-gray-300">🏢 {sale.organization}</p>
+            <p className="text-sm text-gray-300">Buyer: {sale.buyer_name}</p>
             <p className="text-sm text-gray-400">
               {new Date(sale.timestamp).toLocaleString()}
             </p>
@@ -222,7 +219,7 @@ const SalesByDate = ({ stats }) => {
   const sortedDates = Object.keys(stats).sort((a, b) => new Date(b) - new Date(a));
 
   return (
-    <div className="bg-zinc-900  scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 rounded-xl p-6 shadow-md ">
+    <div className="bg-zinc-900 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-zinc-900 rounded-xl p-6 shadow-md ">
       <h2 className="text-2xl font-semibold mb-4">📅 Date-wise Sales Details</h2>
       <div className="space-y-6 max-h-[500px] overflow-y-auto pr-2">
         {sortedDates.map((date) => (
@@ -236,8 +233,7 @@ const SalesByDate = ({ stats }) => {
                 className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 mb-2 shadow-sm"
               >
                 <p className="text-white font-semibold">🛒 {entry.product}</p>
-                <p className="text-sm text-gray-300">👤 User: {entry.user}</p>
-                <p className="text-sm text-gray-300">🏢 Org: {entry.organization}</p>
+                <p className="text-sm text-gray-300">👤 Buyer: {entry.buyer_name}</p>
                 <p className="text-sm text-gray-400">
                   🕒 {new Date(entry.timestamp).toLocaleString()}
                 </p>

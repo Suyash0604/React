@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";  // ✅ Import Link
 import formImage from "../assets/imageee.png";
 
-const Login = ({ user,setUser }) => {
+const Login = ({ setUser }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -20,7 +20,7 @@ const Login = ({ user,setUser }) => {
       navigate("/products"); 
       
     } catch (err) {
-      alert("Login failed");
+      alert("Login failed",err);
     }
   };
 

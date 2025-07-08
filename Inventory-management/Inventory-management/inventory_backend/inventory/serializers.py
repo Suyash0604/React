@@ -1,10 +1,17 @@
 from rest_framework import serializers
 from .models import InventoryItem
-
+from .models import InventoryItem, Supplier
+# serializers.py
 class InventoryItemSerializer(serializers.ModelSerializer):
+    owner_username = serializers.CharField(source='owner.username', read_only=True)
+    supplier = serializers.PrimaryKeyRelatedField(queryset=Supplier.objects.all())
+    supplier_name = serializers.CharField(source='supplier.name', read_only=True) 
+
     class Meta:
         model = InventoryItem
         fields = '__all__'
+
+
 
 from rest_framework import serializers
 from .models import CustomUser
@@ -68,11 +75,23 @@ class SupplierSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class SaleSerializer(serializers.ModelSerializer):
+    product = serializers.StringRelatedField()  # ✅ Return product title as string
     total_price = serializers.SerializerMethodField()
+    user = serializers.CharField(source='user.username', read_only=True)  # Optional: include user name
 
     class Meta:
         model = Sale
-        fields = ['id', 'product', 'quantity', 'organization', 'address', 'timestamp', 'total_price']
+        fields = [
+            'id',
+            'product',
+            'quantity',
+            'buyer_name',
+            'contact_number',
+            'address',
+            'timestamp',
+            'total_price',
+            'user',  # Optional: show user who sold
+        ]
 
     def get_total_price(self, obj):
         return obj.total_price()

@@ -37,7 +37,7 @@ const Products = ({ user }) => {
   const applyFilters = async () => {
     try {
       const cleanFilters = Object.fromEntries(
-        Object.entries(filters).filter(([ v]) => v !== "")
+        Object.entries(filters).filter(([v]) => v !== "")
       );
 
       const params = new URLSearchParams(cleanFilters).toString();
@@ -53,7 +53,10 @@ const Products = ({ user }) => {
 
       setInventory(res.data);
     } catch (err) {
-      console.error("❌ Error applying filters:", err.response?.data || err.message);
+      console.error(
+        "❌ Error applying filters:",
+        err.response?.data || err.message
+      );
     }
   };
 
@@ -108,7 +111,9 @@ const Products = ({ user }) => {
           />
           <select
             className="bg-zinc-900 text-white p-2 rounded"
-            onChange={(e) => setFilters({ ...filters, supplier: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, supplier: e.target.value })
+            }
           >
             <option value="">All Suppliers</option>
             {suppliers.map((s) => (
@@ -121,23 +126,31 @@ const Products = ({ user }) => {
             type="number"
             placeholder="Min Price"
             className="bg-zinc-900 text-white p-2 rounded"
-            onChange={(e) => setFilters({ ...filters, min_price: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, min_price: e.target.value })
+            }
           />
           <input
             type="number"
             placeholder="Max Price"
             className="bg-zinc-900 text-white p-2 rounded"
-            onChange={(e) => setFilters({ ...filters, max_price: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, max_price: e.target.value })
+            }
           />
           <input
             type="date"
             className="bg-zinc-900 text-white p-2 rounded"
-            onChange={(e) => setFilters({ ...filters, start_date: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, start_date: e.target.value })
+            }
           />
           <input
             type="date"
             className="bg-zinc-900 text-white p-2 rounded"
-            onChange={(e) => setFilters({ ...filters, end_date: e.target.value })}
+            onChange={(e) =>
+              setFilters({ ...filters, end_date: e.target.value })
+            }
           />
           <button
             onClick={applyFilters}
@@ -168,13 +181,16 @@ const Products = ({ user }) => {
               <h2 className="text-xl font-semibold">{product.title}</h2>
               <div className="flex flex-wrap gap-4 text-gray-300 text-sm">
                 <p>
-                  <span className="text-white font-medium">Price:</span> ₹{product.price}
+                  <span className="text-white font-medium">Price:</span> ₹
+                  {product.price}
                 </p>
                 <p>
-                  <span className="text-white font-medium">Supplier:</span> {product.supplier}
+                  <span className="text-white font-medium">Supplier:</span>{" "}
+                  {product.supplier_name || "N/A"}
                 </p>
                 <p>
-                  <span className="text-white font-medium">Quantity:</span> {product.Quantity}
+                  <span className="text-white font-medium">Quantity:</span>{" "}
+                  {product.Quantity}
                 </p>
 
                 {user.role === "user" && (
@@ -189,7 +205,8 @@ const Products = ({ user }) => {
                 {user.role === "admin" && (
                   <>
                     <p>
-                      <span className="text-white font-medium">SKU:</span> {product.SKU}
+                      <span className="text-white font-medium">SKU:</span>{" "}
+                      {product.SKU}
                     </p>
                     <p>
                       <span className="text-white font-medium">Created:</span>{" "}

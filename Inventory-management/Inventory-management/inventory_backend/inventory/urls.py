@@ -11,6 +11,8 @@ from .views import clear_all_sales
 from .views import ConfirmPurchaseView, get_bill
 from .views import all_bills
 from .views import all_bills_admin
+from .views import all_sales 
+
 router = DefaultRouter()
 router.register(r'inventory', InventoryItemViewSet)
 router.register(r'suppliers', SupplierViewSet)
@@ -32,5 +34,6 @@ urlpatterns = [
     path("clear-sales/", clear_all_sales, name="clear-sales"),
     path("my-bills/", all_bills),
     path("all-bills/", all_bills_admin),
+    path("sales/", all_sales),
 ]
 

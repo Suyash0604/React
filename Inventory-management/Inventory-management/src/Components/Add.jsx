@@ -64,6 +64,7 @@ const Add = ({ onClose, editableProduct }) => {
       onClose();
     } else {
       data.id = nanoid();
+      console.log("🔍 Submitted data:", data);
       addProduct(data); // Ensure backend accepts `owner` field
       onClose();
       reset();
@@ -109,7 +110,7 @@ const Add = ({ onClose, editableProduct }) => {
         >
           <option value="">Select Supplier</option>
           {suppliers.map((supplier) => (
-            <option key={supplier.id} value={supplier.name}>
+            <option key={supplier.id} value={supplier.id}>
               {supplier.name}
             </option>
           ))}

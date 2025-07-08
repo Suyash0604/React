@@ -19,10 +19,9 @@ class InventoryItem(models.Model):
     SKU = models.CharField(max_length=50, unique=True)
     Quantity = models.IntegerField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    supplier = models.CharField(max_length=100)
     Date = models.DateField()
     threshold = models.IntegerField(default=5)
-    
+    supplier = models.ForeignKey("Supplier", on_delete=models.SET_NULL, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     owner = models.ForeignKey(  
@@ -39,7 +38,7 @@ class InventoryItem(models.Model):
 
 
 from django.db import models
-import uuid
+import uuid     
 
 class Supplier(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)  # Unique ID
@@ -56,7 +55,8 @@ class Supplier(models.Model):
 class Sale(models.Model):
     product = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    organization = models.CharField(max_length=255)
+    buyer_name = models.CharField(max_length=100)           # ✅ NEW
+    contact_number = models.CharField(max_length=15)  
     address = models.TextField()
     timestamp = models.DateTimeField(auto_now_add=True)
 
@@ -68,7 +68,8 @@ class Sale(models.Model):
 # models.py
 class Bill(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    organization = models.CharField(max_length=255)
+    buyer_name = models.CharField(max_length=100)       # ✅ New
+    contact_number = models.CharField(max_length=15)
     discount_percentage = models.FloatField(default=0)
     discount_amount = models.FloatField(default=0)
     gst_percentage = models.FloatField(default=18)

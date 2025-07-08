@@ -3,10 +3,11 @@ import { useCart } from "../context/CartContext";
 
 const BuyProduct = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
+  const [buyerName, setBuyerName] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   const [error, setError] = useState("");
   const { addToCart } = useCart();
 
-  // Debug log to verify which product is rendering
   console.log("🛒 Rendering BuyProduct for:", product?.title);
 
   const totalPrice =
@@ -16,6 +17,11 @@ const BuyProduct = ({ product, onClose }) => {
 
   const handleAddToCart = () => {
     setError("");
+
+    if (!buyerName.trim() || !contactNumber.trim()) {
+      setError("Please enter buyer name and contact number.");
+      return;
+    }
 
     if (quantity < 1) {
       setError("Please enter a valid quantity.");
@@ -28,12 +34,14 @@ const BuyProduct = ({ product, onClose }) => {
     }
 
     addToCart({
-      product: { ...product, price: parseFloat(product.price) }, // force number
+      product: { ...product, price: parseFloat(product.price) },
       quantity,
       totalPrice: parseFloat(product.price) * quantity,
+      buyerName,
+      contactNumber,
     });
 
-    onClose(); // Close the modal
+    onClose();
   };
 
   return (
@@ -41,6 +49,20 @@ const BuyProduct = ({ product, onClose }) => {
       <h2 className="text-xl font-semibold mb-4">Buy {product?.title}</h2>
 
       <div className="flex flex-col gap-4">
+        <input
+          type="text"
+          placeholder="Buyer Name"
+          value={buyerName}
+          onChange={(e) => setBuyerName(e.target.value)}
+          className="bg-zinc-900 text-white p-2 rounded"
+        />
+        <input
+          type="text"
+          placeholder="Contact Number"
+          value={contactNumber}
+          onChange={(e) => setContactNumber(e.target.value)}
+          className="bg-zinc-900 text-white p-2 rounded"
+        />
         <input
           type="number"
           placeholder="Quantity"
