@@ -73,7 +73,7 @@ const BillPage = () => {
           <div style={{ flex: 1, minWidth: "220px" }}>
             <h3 style={{ fontWeight: "600", marginBottom: "6px" }}>Billed To</h3>
             <p style={{ margin: "4px 0" }}><strong>Name:</strong> {bill.buyer_name}</p>
-            <p style={{ margin: "4px 0" }}><strong>Contact:</strong> {bill.contact_number}</p>
+            <p style={{ margin: "4px 0" }}><strong>Phone:</strong> {bill.contact_number}</p>
             <p style={{ margin: "4px 0" }}><strong>Address:</strong> {bill.address}</p>
           </div>
         </div>

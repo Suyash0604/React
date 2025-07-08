@@ -12,10 +12,12 @@ from .views import ConfirmPurchaseView, get_bill
 from .views import all_bills
 from .views import all_bills_admin
 from .views import all_sales 
+from .views import DiscountViewSet
 
 router = DefaultRouter()
 router.register(r'inventory', InventoryItemViewSet)
 router.register(r'suppliers', SupplierViewSet)
+router.register(r'discounts', DiscountViewSet)
 
 
 

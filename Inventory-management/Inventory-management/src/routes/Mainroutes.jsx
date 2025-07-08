@@ -9,6 +9,7 @@ import ViewSuppliers from "../Components/ViewSuppliers.jsx";
 import CartPage from "../Components/CartPage";
 import BillPage from "../Components/BillPage";
 import MyBills from "../Components/MyBills.jsx";
+import DiscountsPage from "../Components/DiscountPage";
 
 const Mainroutes = ({ user }) => {
   return (
@@ -30,11 +31,21 @@ const Mainroutes = ({ user }) => {
           )
         }
       />
-
+      <Route
+        path="/discounts"
+        element={
+          user?.role === "admin" ? (
+            <DiscountsPage user={user} />
+          ) : (
+            <Navigate to="/" />
+          )
+        }
+      />
       <Route path="/register" element={<Register />} />
       <Route path="/add-supplier" element={<AddSupplier user={user} />} />
       <Route path="/view-suppliers" element={<ViewSuppliers user={user} />} />
       <Route path="/my-bills" element={<MyBills />} />
+
     </Routes>
   );
 };

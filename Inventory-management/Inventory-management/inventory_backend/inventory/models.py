@@ -87,21 +87,36 @@ class Bill(models.Model):
 from django.core.exceptions import ValidationError
 from decimal import Decimal
 class BillItem(models.Model):
-    bill = models.ForeignKey(Bill, related_name="items", on_delete=models.CASCADE)
+    bill = models.ForeignKey(Bill, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(InventoryItem, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
-    discount = models.FloatField(default=0.0)  # in percentage
-    gst = models.FloatField(default=0.0)       # in percentage
-
-    def clean(self):
-        if self.discount > 20:
-            raise ValidationError("Discount cannot exceed 20%")
+    discount = models.FloatField(default=0)  # percentage
+    gst = models.FloatField(default=18)      # percentage
 
     def total_price(self):
-        base = self.product.price * self.quantity
-        discount_decimal = Decimal(str(self.discount)) / Decimal('100')
-        gst_decimal = Decimal(str(self.gst)) / Decimal('100')
+        base_price = Decimal(self.quantity) * self.product.price
+        discount_amount = (Decimal(str(self.discount)) / Decimal("100")) * base_price
+        taxable_price = base_price - discount_amount
+        gst_amount = (Decimal(str(self.gst)) / Decimal("100")) * taxable_price
+        return taxable_price + gst_amount
+# models.py
 
-        discounted = base - (discount_decimal * base)
-        taxed = discounted + (gst_decimal * discounted)
-        return round(taxed, 2)
+from django.db import models
+from django.conf import settings
+
+class Discount(models.Model):
+    DISCOUNT_TYPE_CHOICES = [
+        ("percentage", "Percentage"),
+        ("value", "Value"),
+    ]
+
+    outlet = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    product = models.ForeignKey("InventoryItem", on_delete=models.CASCADE)
+    discount_type = models.CharField(max_length=20, choices=DISCOUNT_TYPE_CHOICES)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.outlet.username} - {self.product.title} - {self.discount_type} {self.amount}"

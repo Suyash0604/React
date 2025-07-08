@@ -1,5 +1,4 @@
 from django.shortcuts import render
-
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -225,75 +224,112 @@ def clear_all_sales(request):
         return Response({"error": "Unauthorized"}, status=403)
     Sale.objects.all().delete()
     return Response({"message": "All sales data cleared successfully."}, status=200)
+     # import the new model
+
+from datetime import date
+from .models import Discount
+
+from decimal import Decimal
+from datetime import date
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from .models import InventoryItem, Bill, BillItem, Discount
 
 class ConfirmPurchaseView(APIView):
     permission_classes = [IsAuthenticated]
+
     def post(self, request):
         data = request.data
         items = data.get("items", [])
         buyer_name = data.get("buyer_name")
         contact_number = data.get("contact_number")
         address = data.get("address")
+
         if not items or not buyer_name or not contact_number or not address:
             return Response({"error": "Incomplete data"}, status=400)
-        total = 0
-        for entry in items:
-            try:
-                product = InventoryItem.objects.get(id=entry["product"])
-                qty = int(entry["quantity"])
-                if qty > product.Quantity:
-                    return Response({"error": f"Not enough stock for {product.title}"}, status=400)
-                total += qty * float(product.price)
-            except Exception as e:
-                return Response({"error": str(e)}, status=400)
-        discount_percentage = 0
-        if total > 10000:
-            discount_percentage = 20
-        elif total > 5000:
-            discount_percentage = 15
-        elif total > 2000:
-            discount_percentage = 10
-        elif total > 1000:
-            discount_percentage = 5
-        discount_amount = (discount_percentage / 100) * total
-        gst_percentage = 18
-        gst_amount = ((total - discount_amount) * gst_percentage) / 100
-        final_amount = total - discount_amount + gst_amount
+
+        total = Decimal("0")
+        total_discount_amount = Decimal("0")
+        discount_percentage_total = Decimal("0")
+
         bill = Bill.objects.create(
             user=request.user,
             buyer_name=buyer_name,
             contact_number=contact_number,
             address=address,
-            discount_percentage=discount_percentage,
-            discount_amount=round(discount_amount, 2),
-            gst_percentage=gst_percentage,
-            gst_amount=round(gst_amount, 2)
         )
+
         for entry in items:
             try:
                 product = InventoryItem.objects.get(id=entry["product"])
                 qty = int(entry["quantity"])
+
+                if qty > product.Quantity:
+                    bill.delete()
+                    return Response({"error": f"Not enough stock for {product.title}"}, status=400)
+
+                product_total = Decimal(qty) * product.price
+                today = date.today()
+
+                # Check for applicable discount
+                discount = Discount.objects.filter(
+                    product=product,
+                    outlet=request.user,
+                    start_date__lte=today,
+                    end_date__gte=today
+                ).first()
+
+                discount_amount = Decimal("0")
+                discount_percentage = Decimal("0")
+
+                if discount:
+                    if discount.discount_type == "percentage":
+                        discount_percentage = Decimal(str(discount.amount))
+                        discount_amount = (discount_percentage / Decimal("100")) * product_total
+                    elif discount.discount_type == "value":
+                        discount_amount = Decimal(str(discount.amount))
+                        discount_percentage = Decimal("0")
+
+                total += product_total
+                total_discount_amount += discount_amount
+                discount_percentage_total += discount_percentage
+
                 product.Quantity -= qty
                 product.save()
+
                 BillItem.objects.create(
                     bill=bill,
                     product=product,
                     quantity=qty,
-                    discount=discount_percentage,
-                    gst=gst_percentage
+                    discount=float(discount_percentage),  # still store as float
+                    gst=18
                 )
+
             except Exception as e:
                 bill.delete()
                 return Response({"error": str(e)}, status=400)
+
+        gst_percentage = Decimal("18")
+        gst_amount = ((total - total_discount_amount) * gst_percentage) / Decimal("100")
+        final_amount = total - total_discount_amount + gst_amount
+
+        bill.discount_percentage = float(discount_percentage_total)
+        bill.discount_amount = float(total_discount_amount)
+        bill.gst_percentage = float(gst_percentage)
+        bill.gst_amount = float(gst_amount)
+        bill.save()
+
         return Response({
             "bill_id": bill.id,
-            "original_amount": round(total, 2),
-            "discount_percentage": discount_percentage,
-            "discount_amount": round(discount_amount, 2),
-            "gst_percentage": gst_percentage,
-            "gst_amount": round(gst_amount, 2),
-            "final_amount": round(final_amount, 2)
+            "original_amount": float(total),
+            "discount_percentage": float(discount_percentage_total),
+            "discount_amount": float(total_discount_amount),
+            "gst_percentage": float(gst_percentage),
+            "gst_amount": float(gst_amount),
+            "final_amount": float(final_amount)
         }, status=201)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -388,3 +424,16 @@ def all_sales(request):
         }
         for item in bill_items
     ])
+
+from rest_framework import viewsets, permissions
+from .models import Discount
+from .serializers import DiscountSerializer
+
+class IsAdminOnly(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and request.user.role == "admin"
+
+class DiscountViewSet(viewsets.ModelViewSet):
+    queryset = Discount.objects.all().order_by("-created_at")
+    serializer_class = DiscountSerializer
+    permission_classes = [IsAdminOnly]

@@ -95,3 +95,39 @@ class SaleSerializer(serializers.ModelSerializer):
 
     def get_total_price(self, obj):
         return obj.total_price()
+    
+
+from rest_framework import serializers
+from .models import Discount
+
+
+class DiscountSerializer(serializers.ModelSerializer):
+    outlet_username = serializers.CharField(source='outlet.username', read_only=True)
+    product_title = serializers.CharField(source='product.title', read_only=True)
+
+    class Meta:
+        model = Discount
+        fields = [
+            'id',
+            'product',         # for form submission
+            'product_title',   # for readable display
+            'outlet',          # for form submission
+            'outlet_username', # for readable display
+            'discount_type',
+            'amount',
+            'start_date',
+            'end_date',
+            'created_at',
+        ]
+
+    def validate(self, data):
+        discount_type = data.get('discount_type')
+        amount = data.get('amount')
+
+        if discount_type == "percentage" and amount > 20:
+            raise serializers.ValidationError("Percentage discount cannot exceed 20%.")
+        
+        if discount_type == "value" and amount > 10000:
+            raise serializers.ValidationError("Flat discount value cannot exceed ₹10,000.")
+
+        return data
