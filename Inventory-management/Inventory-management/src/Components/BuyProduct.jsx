@@ -57,7 +57,7 @@ const BuyProduct = ({ product, onClose }) => {
           className="bg-zinc-900 text-white p-2 rounded"
         />
         <input
-          type="text"
+          type="number"
           placeholder="Contact Number"
           value={contactNumber}
           onChange={(e) => setContactNumber(e.target.value)}

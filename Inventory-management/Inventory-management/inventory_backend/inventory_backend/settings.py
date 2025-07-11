@@ -148,3 +148,10 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'inventory.CustomUser'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
+EMAIL_HOST_USER = '917f7c3e121129'
+EMAIL_HOST_PASSWORD = 'f053315213c971'
+EMAIL_PORT = 2525
+EMAIL_USE_TLS = True  # must match or be allowed in Mailtrap

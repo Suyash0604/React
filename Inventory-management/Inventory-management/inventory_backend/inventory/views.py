@@ -437,3 +437,33 @@ class DiscountViewSet(viewsets.ModelViewSet):
     queryset = Discount.objects.all().order_by("-created_at")
     serializer_class = DiscountSerializer
     permission_classes = [IsAdminOnly]
+    
+    
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.core.mail import EmailMessage
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_bill_email(request):
+    email = request.data.get('email')
+    bill_id = request.data.get('bill_id')
+    pdf_file = request.FILES.get('pdf')
+
+    if not email or not pdf_file:
+        return Response({'error': 'Missing email or PDF'}, status=400)
+
+    subject = f"Your Bill #{bill_id} from Inventory System"
+    body = "Please find your bill attached."
+
+    message = EmailMessage(
+        subject,
+        body,
+        'from@example.com',  # replace with your from email (must match SMTP user)
+        [email]
+    )
+    message.attach(f"Bill-{bill_id}.pdf", pdf_file.read(), 'application/pdf')
+    message.send()
+
+    return Response({'status': 'success'})

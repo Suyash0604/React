@@ -13,6 +13,8 @@ from .views import all_bills
 from .views import all_bills_admin
 from .views import all_sales 
 from .views import DiscountViewSet
+from .views import send_bill_email
+
 
 router = DefaultRouter()
 router.register(r'inventory', InventoryItemViewSet)
@@ -37,5 +39,6 @@ urlpatterns = [
     path("my-bills/", all_bills),
     path("all-bills/", all_bills_admin),
     path("sales/", all_sales),
+    path('send_bill_email/', send_bill_email, name='send-bill-email'),
 ]
 
