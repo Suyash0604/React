@@ -31,8 +31,8 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('current-user/', CurrentUserView.as_view(), name='current-user'),
     path('buy/', BuyProductView.as_view(), name='buy-product'),
-    path('confirm_purchase/', ConfirmPurchaseView.as_view(), name='confirm-purchase'),  # ✅ ADD THIS
-    path('bill/<int:bill_id>/', get_bill, name='get-bill'),  # ✅ Optional, but useful
+    path('confirm_purchase/', ConfirmPurchaseView.as_view(), name='confirm-purchase'),  
+    path('bill/<int:bill_id>/', get_bill, name='get-bill'),  
     path('sales-summary/', product_sales_summary),
     path("dashboard-stats/", dashboard_stats),
     path("clear-sales/", clear_all_sales, name="clear-sales"),

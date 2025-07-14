@@ -35,26 +35,36 @@ const InventoryTable = () => {
     fetchData();
   }, [token]);
 
-  // Filter sales
-  const filteredSales = sales.filter((sale) => {
-    const matchesProduct = sale.product?.toLowerCase().includes(productFilter.toLowerCase());
-    const matchesOwner = ownerFilter === "" || (sale.user || "").toLowerCase().includes(ownerFilter.toLowerCase());
-    const matchesDate =
-      (!startDate || new Date(sale.timestamp) >= new Date(startDate)) &&
-      (!endDate || new Date(sale.timestamp) <= new Date(endDate));
-    return matchesProduct && matchesOwner && matchesDate;
+  // ✅ Filter sales
+const filteredSales = sales.filter((sale) => {
+  const matchesProduct = sale.product?.toLowerCase().includes(productFilter.toLowerCase());
+  const matchesOwner = ownerFilter === "" || (sale.user || "").toLowerCase().includes(ownerFilter.toLowerCase());
+  const matchesDate =
+    (!startDate || new Date(sale.timestamp) >= new Date(startDate)) &&
+    (!endDate || new Date(sale.timestamp) <= new Date(endDate));
+  return matchesProduct && matchesOwner && matchesDate;
+});
+
+// ✅ Sort by timestamp descending: recent sales first
+filteredSales.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  // ✅ Filter inventory by productFilter & ownerFilter
+  const filteredInventory = inventory.filter((item) => {
+    const matchesProduct = item.title.toLowerCase().includes(productFilter.toLowerCase());
+    const matchesOwner = ownerFilter === "" || (item.owner_username || "").toLowerCase().includes(ownerFilter.toLowerCase());
+    return matchesProduct && matchesOwner;
   });
 
+  // Pagination
   const paginatedSales = filteredSales.slice(
     (currentSalesPage - 1) * itemsPerPage,
     currentSalesPage * itemsPerPage
   );
-
   const totalSalesPages = Math.ceil(filteredSales.length / itemsPerPage);
 
-  // Combine inventory + sales + discount
+  // ✅ Build combined report using filteredInventory & filteredSales
   const combined = {};
-  inventory.forEach((item) => {
+  filteredInventory.forEach((item) => {
     const key = `${item.owner_username}-${item.title}`;
     combined[key] = {
       outlet: item.owner_username,
@@ -86,7 +96,6 @@ const InventoryTable = () => {
     combined[key].totalSalesValue += Number(sale.total_price);
   });
 
-  // Add discount to combined report
   discounts.forEach((d) => {
     const key = `${d.outlet_username}-${d.product_title}`;
     if (combined[key]) {
@@ -97,7 +106,7 @@ const InventoryTable = () => {
 
   const combinedReport = Object.values(combined);
 
-  // ✅ Add discount info into sales report
+  // ✅ Add discount info into sales for CSV
   const salesWithDiscount = filteredSales.map((sale) => {
     const found = discounts.find(
       (d) => d.outlet_username === sale.user && d.product_title === sale.product

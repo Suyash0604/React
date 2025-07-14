@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     'inventory',
+    'django_celery_beat',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -146,12 +148,38 @@ STATIC_URL = 'static/'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-AUTH_USER_MODEL = 'inventory.CustomUser'
+# settings.py
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'sandbox.smtp.mailtrap.io'
-EMAIL_HOST_USER = '917f7c3e121129'
-EMAIL_HOST_PASSWORD = 'f053315213c971'
-EMAIL_PORT = 2525
-EMAIL_USE_TLS = True  # must match or be allowed in Mailtrap
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'suyashgaikwad642005@gmail.com'        # your Gmail address
+EMAIL_HOST_PASSWORD = 'cxhk icjt kbko rbzh'        # the 16-character app password you generated
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER      
+# optional: use your email as default sender
+AUTH_USER_MODEL = 'inventory.CustomUser'
+
+
+from celery.schedules import crontab
+
+
+CELERY_BEAT_SCHEDULE = {
+    'send_stock_report_4am': {
+        'task': 'inventory.tasks.send_stock_report',
+        'schedule': crontab(hour=4, minute=0),
+    },
+    'send_sales_report_12pm': {
+        'task': 'inventory.tasks.send_sales_and_stock_report',
+        'schedule': crontab(hour=12, minute=0),
+    },
+    'send_sales_report_6pm': {
+        'task': 'inventory.tasks.send_sales_and_stock_report',
+        'schedule': crontab(hour=18, minute=0),
+    },
+}
+
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'   # required: install & run Redis
+CELERY_RESULT_BACKEND = 'django-db'              # okay, store results in DB
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'

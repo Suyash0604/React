@@ -415,8 +415,8 @@ def all_sales(request):
         {
             "product": item.product.title,
             "quantity": item.quantity,
-            "buyer_name": item.bill.buyer_name,             # ✅ Added
-            "contact_number": item.bill.contact_number,     # ✅ Added
+            "buyer_name": item.bill.buyer_name,            
+            "contact_number": item.bill.contact_number,     
             "address": item.bill.address,
             "timestamp": item.bill.timestamp,
             "user": item.bill.user.username,
@@ -460,7 +460,7 @@ def send_bill_email(request):
     message = EmailMessage(
         subject,
         body,
-        'from@example.com',  # replace with your from email (must match SMTP user)
+        'suyash.gaikwad@vit.edu',  
         [email]
     )
     message.attach(f"Bill-{bill_id}.pdf", pdf_file.read(), 'application/pdf')

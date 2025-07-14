@@ -44,7 +44,7 @@ const Register = () => {
       alert("Registered successfully! Please login.");
       navigate("/login");
     } catch (err) {
-      alert("Registration failed");
+      alert("Registration failed",err);
     }
   };
 

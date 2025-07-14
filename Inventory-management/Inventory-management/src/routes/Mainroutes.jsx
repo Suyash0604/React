@@ -10,6 +10,7 @@ import CartPage from "../Components/CartPage";
 import BillPage from "../Components/BillPage";
 import MyBills from "../Components/MyBills.jsx";
 import DiscountsPage from "../Components/DiscountPage";
+import ProductDetail from "../Components/ProductDetail.jsx";
 
 const Mainroutes = ({ user }) => {
   return (
@@ -45,7 +46,7 @@ const Mainroutes = ({ user }) => {
       <Route path="/add-supplier" element={<AddSupplier user={user} />} />
       <Route path="/view-suppliers" element={<ViewSuppliers user={user} />} />
       <Route path="/my-bills" element={<MyBills />} />
-
+      <Route path="/products/:id" element={<ProductDetail />} />
     </Routes>
   );
 };
