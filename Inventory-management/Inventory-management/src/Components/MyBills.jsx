@@ -10,7 +10,7 @@ const MyBills = () => {
   const [error, setError] = useState("");
 
   // Filter states
-  const [organization, setOrganization] = useState("");
+
   const [minAmount, setMinAmount] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -38,11 +38,7 @@ const MyBills = () => {
   useEffect(() => {
     let filtered = [...bills];
 
-    if (organization) {
-      filtered = filtered.filter((bill) =>
-        bill.organization.toLowerCase().includes(organization.toLowerCase())
-      );
-    }
+    
 
     if (minAmount) {
       filtered = filtered.filter(
@@ -63,40 +59,59 @@ const MyBills = () => {
     }
 
     setFilteredBills(filtered);
-  }, [organization, minAmount, fromDate, toDate, bills]);
+  }, [minAmount, fromDate, toDate, bills]);
 
   return (
     <div className="p-6 text-white max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold mb-4">📜 My Bills</h2>
 
       {/* Filters */}
-      <div className="grid md:grid-cols-4 gap-4 bg-zinc-900 p-4 rounded-xl mb-6">
-        <input
-          type="text"
-          placeholder="Search by organization"
-          className="p-2 rounded bg-zinc-800 text-white"
-          value={organization}
-          onChange={(e) => setOrganization(e.target.value)}
-        />
-        <input
-          type="number"
-          placeholder="Min amount (₹)"
-          className="p-2 rounded bg-zinc-800 text-white"
-          value={minAmount}
-          onChange={(e) => setMinAmount(e.target.value)}
-        />
-        <input
-          type="date"
-          className="p-2 rounded bg-zinc-800 text-white"
-          value={fromDate}
-          onChange={(e) => setFromDate(e.target.value)}
-        />
-        <input
-          type="date"
-          className="p-2 rounded bg-zinc-800 text-white"
-          value={toDate}
-          onChange={(e) => setToDate(e.target.value)}
-        />
+      <div className="bg-zinc-900 p-4 rounded-xl mb-6">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-lg font-semibold text-indigo-400">
+            🔍 Filter Bills
+          </h3>
+          <button
+            onClick={() => {
+              setMinAmount("");
+              setFromDate("");
+              setToDate("");
+            }}
+            className="text-xs text-red-400 hover:text-red-300"
+          >
+            Clear Filters
+          </button>
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-400 mb-1">Min Amount (₹)</label>
+            <input
+              type="number"
+              placeholder="e.g., 500"
+              className="p-2 rounded bg-zinc-800 text-white"
+              value={minAmount}
+              onChange={(e) => setMinAmount(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-400 mb-1">From Date</label>
+            <input
+              type="date"
+              className="p-2 rounded bg-zinc-800 text-white"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+            />
+          </div>
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-400 mb-1">To Date</label>
+            <input
+              type="date"
+              className="p-2 rounded bg-zinc-800 text-white"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Error and Loading */}
