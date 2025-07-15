@@ -3,8 +3,7 @@ import axios from "axios";
 import Nav from "./Components/Nav";
 import Mainroutes from "./routes/Mainroutes";
 import { Routes, Route, useLocation } from "react-router-dom";
-import Login from "./Components/Login";
-import Register from "./Components/Register";
+import AuthPage from "./Components/AuthPage";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -15,7 +14,7 @@ const App = () => {
     const token = localStorage.getItem("token");
     if (token) {
       axios
-        .get("http://localhost:8000/api/current-user/", {
+        .get("http://192.168.1.26:8000/api/current-user/", {
           headers: { Authorization: `Token ${token}` },
         })
         .then((res) => setUser(res.data))
@@ -29,7 +28,8 @@ const App = () => {
     }
   }, []);
 
-  if (loading) return <div className="text-white text-center pt-10">Loading...</div>;
+  if (loading)
+    return <div className="text-white text-center pt-10">Loading...</div>;
 
   // Only show Nav when user is logged in
   return (
@@ -38,9 +38,7 @@ const App = () => {
       <Routes>
         {!user ? (
           <>
-            <Route path="/login" element={<Login user={user} setUser={setUser} />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="*" element={<Login setUser={setUser} />} />
+            <Route path="/*" element={<AuthPage setUser={setUser} />} />
           </>
         ) : (
           <Route path="/*" element={<Mainroutes user={user} />} />

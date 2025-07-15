@@ -38,7 +38,7 @@ const CartPage = () => {
   try {
     const token = localStorage.getItem("token");
     const res = await axios.post(
-      "http://localhost:8000/api/confirm_purchase/",
+      "http://192.168.1.26:8000/api/confirm_purchase/",
       {
         buyer_name: buyerName,
         contact_number: contactNumber,

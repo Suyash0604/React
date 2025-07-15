@@ -21,12 +21,12 @@ const Home = ({ user }) => {
       try {
         const token = localStorage.getItem("token");
         if (user?.role === "admin") {
-          const res = await axios.get("http://localhost:8000/api/dashboard-stats/", {
+          const res = await axios.get("http://192.168.1.26:8000/api/dashboard-stats/", {
             headers: { Authorization: `Token ${token}` },
           });
           setSalesStats(res.data);
         } else {
-          const res = await axios.get("http://localhost:8000/api/my-bills/", {
+          const res = await axios.get("http://192.168.1.26:8000/api/my-bills/", {
             headers: { Authorization: `Token ${token}` },
           });
           setUserPurchases(res.data);
@@ -157,7 +157,7 @@ const RecentPurchases = ({ salesStats, setSalesStats }) => (
         onClick={async () => {
           if (window.confirm("Are you sure you want to clear all sales data?")) {
             try {
-              await axios.delete("http://localhost:8000/api/clear-sales/", {
+              await axios.delete("http://192.168.1.26:8000/api/clear-sales/", {
                 headers: {
                   Authorization: `Token ${localStorage.getItem("token")}`,
                 },

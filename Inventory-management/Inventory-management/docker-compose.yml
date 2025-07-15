@@ -1,4 +1,4 @@
-version: "3.9"
+
 
 services:
   backend:
@@ -16,9 +16,9 @@ services:
       context: .
     ports:
       - "4173:4173"
-    volumes:
-      - .:/app
-      - /app/node_modules
+    # volumes:
+    #   - .:/app
+    #   - /app/node_modules
     depends_on:
       - backend
 

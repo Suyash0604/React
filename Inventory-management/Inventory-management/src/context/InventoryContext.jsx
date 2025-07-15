@@ -13,7 +13,7 @@ export const InventoryProvider = ({ children }) => {
   // ====== INVENTORY ======
   const fetchInventory = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/inventory/", {
+      const res = await axios.get("http://192.168.1.26:8000/api/inventory/", {
         headers: { Authorization: `Token ${token}` },
       });
       setInventory(res.data);
@@ -24,7 +24,7 @@ export const InventoryProvider = ({ children }) => {
 
   const deleteProduct = async (id) => {
     try {
-      await axios.delete(`http://127.0.0.1:8000/api/inventory/${id}/`, {
+      await axios.delete(`http://192.168.1.26:8000/api/inventory/${id}/`, {
         headers: { Authorization: `Token ${token}` },
       });
       toast.error("Deleted!");
@@ -36,7 +36,7 @@ export const InventoryProvider = ({ children }) => {
 
   const editProduct = async (updatedItem) => {
     try {
-      await axios.put(`http://127.0.0.1:8000/api/inventory/${updatedItem.id}/`, updatedItem, {
+      await axios.put(`http://192.168.1.26:8000/api/inventory/${updatedItem.id}/`, updatedItem, {
         headers: { Authorization: `Token ${token}` },
       });
       toast.success("Edited!");
@@ -48,7 +48,7 @@ export const InventoryProvider = ({ children }) => {
 
   const addProduct = async (newItem) => {
     try {
-      await axios.post("http://127.0.0.1:8000/api/inventory/", newItem, {
+      await axios.post("http://192.168.1.26:8000/api/inventory/", newItem, {
         headers: { Authorization: `Token ${token}` },
       });
       toast.success("Added!");
@@ -61,7 +61,7 @@ export const InventoryProvider = ({ children }) => {
   // ====== SUPPLIERS ======
   const fetchSuppliers = async () => {
     try {
-      const res = await axios.get("http://127.0.0.1:8000/api/suppliers/", {
+      const res = await axios.get("http://192.168.1.26:8000/api/suppliers/", {
         headers: { Authorization: `Token ${token}` },
       });
       setSuppliers(res.data);
@@ -87,6 +87,7 @@ export const InventoryProvider = ({ children }) => {
         editProduct,
         addProduct,
         setInventory,
+        fetchInventory,
       }}
     >
       {children}

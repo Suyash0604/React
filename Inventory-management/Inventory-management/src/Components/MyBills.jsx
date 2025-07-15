@@ -19,7 +19,7 @@ const MyBills = () => {
     const fetchBills = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8000/api/my-bills/", {
+        const res = await axios.get("http://192.168.1.26:8000/api/my-bills/", {
           headers: { Authorization: `Token ${token}` },
         });
         setBills(res.data);

@@ -7,7 +7,7 @@ const AllBills = ({ user }) => {
   useEffect(() => {
     const fetchBills = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/all-bills/", {
+        const res = await axios.get("http://192.168.1.26:8000/api/all-bills/", {
           headers: {
             Authorization: `Token ${localStorage.getItem("token")}`,
           },

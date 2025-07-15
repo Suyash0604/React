@@ -7,7 +7,7 @@ import BuyProduct from "./BuyProduct";
 import { QRCodeCanvas } from "qrcode.react";
 
 const Products = ({ user }) => {
-  const { inventory, deleteProduct, setInventory } = useInventory();
+  const { inventory, deleteProduct, setInventory,fetchInventory  } = useInventory();
   const [showForm, setShowForm] = useState(false);
   const [editableProduct, setEditableProduct] = useState(null);
   const [buyProduct, setBuyProduct] = useState(null);
@@ -22,12 +22,16 @@ const Products = ({ user }) => {
     end_date: "",
   });
 
+   useEffect(() => {
+    fetchInventory();
+  }, []);
+
   const [suppliers, setSuppliers] = useState([]);
 
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/suppliers/", {
+        const res = await axios.get("http://192.168.1.26:8000/api/suppliers/", {
           headers: { Authorization: `Token ${localStorage.getItem("token")}` },
         });
         setSuppliers(res.data);
@@ -48,7 +52,7 @@ const Products = ({ user }) => {
       if (!token) return;
 
       const res = await axios.get(
-        `http://localhost:8000/api/inventory/?${params}`,
+        `http://192.168.1.26:8000/api/inventory/?${params}`,
         { headers: { Authorization: `Token ${token}` } }
       );
       setInventory(res.data);

@@ -11,7 +11,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:8000/api/inventory/${id}/`, {
+        const res = await axios.get(`http://192.168.1.26:8000/api/inventory/${id}/`, {
           headers: { Authorization: `Token ${token}` },
         });
         setProduct(res.data);

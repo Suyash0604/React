@@ -22,7 +22,7 @@
       const token = localStorage.getItem("token");
       console.log("Token before request:", token); // Check token
 
-      const res = await axios.get("http://localhost:8000/api/suppliers/", {
+      const res = await axios.get("http://192.168.1.26:8000/api/suppliers/", {
         headers: {
           Authorization: `Token ${token}`,
         },
@@ -39,7 +39,7 @@
 
     const handleDelete = async (id) => {
       try {
-        await axios.delete(`http://localhost:8000/api/suppliers/${id}/`, {
+        await axios.delete(`http://192.168.1.26:8000/api/suppliers/${id}/`, {
           headers: { Authorization: `Token ${token}` },
         });
         fetchSuppliers();
@@ -55,7 +55,7 @@
 
     const handleUpdate = async () => {
       try {
-        await axios.put(`http://localhost:8000/api/suppliers/${editingId}/`, editForm, {
+        await axios.put(`http://192.168.1.26:8000/api/suppliers/${editingId}/`, editForm, {
           headers: { Authorization: `Token ${token}` },
         });
         setEditingId(null);

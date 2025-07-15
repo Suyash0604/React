@@ -17,7 +17,7 @@ const BillPage = () => {
     const fetchBill = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:8000/api/bill/${billId}/`, {
+        const res = await axios.get(`http://192.168.1.26:8000/api/bill/${billId}/`, {
           headers: { Authorization: `Token ${token}` },
         });
         setBill(res.data);
@@ -76,7 +76,7 @@ const BillPage = () => {
       formData.append("pdf", pdfBlob, `Bill-${billId}.pdf`);
 
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:8000/api/send_bill_email/", formData, {
+      await axios.post("http://192.168.1.26:8000/api/send_bill_email/", formData, {
         headers: { Authorization: `Token ${token}` },
       });
 

@@ -19,13 +19,13 @@ const DiscountPage = () => {
   const fetchInitialData = async () => {
     try {
       const [productsRes, usersRes, discountsRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/inventory/", {
+        axios.get("http://192.168.1.26:8000/api/inventory/", {
           headers: { Authorization: `Token ${token}` },
         }),
-        axios.get("http://localhost:8000/api/users/", {
+        axios.get("http://192.168.1.26:8000/api/users/", {
           headers: { Authorization: `Token ${token}` },
         }),
-        axios.get("http://localhost:8000/api/discounts/", {
+        axios.get("http://192.168.1.26:8000/api/discounts/", {
           headers: { Authorization: `Token ${token}` },
         }),
       ]);
@@ -44,7 +44,7 @@ const DiscountPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:8000/api/discounts/", form, {
+      await axios.post("http://192.168.1.26:8000/api/discounts/", form, {
         headers: { Authorization: `Token ${token}` },
       });
       setForm({

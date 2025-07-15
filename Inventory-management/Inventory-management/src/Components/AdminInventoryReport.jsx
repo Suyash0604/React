@@ -12,7 +12,7 @@ const AdminInventoryReport = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/users/", {
+        const res = await axios.get("http://192.168.1.26:8000/api/users/", {
           headers: { Authorization: `Token ${token}` },
         });
         setUsers(res.data);
@@ -27,7 +27,7 @@ const AdminInventoryReport = () => {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        let url = "http://localhost:8000/api/inventory/";
+        let url = "http://192.168.1.26:8000/api/inventory/";
         if (selectedUser) {
           url += `?owner=${selectedUser}`;
         }

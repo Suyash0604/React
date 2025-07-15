@@ -30,7 +30,7 @@ const AddSupplier = ({ user }) => {
       return;
     }
     try {
-      await axios.post("http://localhost:8000/api/suppliers/", form, {
+      await axios.post("http://192.168.1.26:8000/api/suppliers/", form, {
         headers: { Authorization: `Token ${localStorage.getItem("token")}` },
       });
       alert("Supplier added successfully!");

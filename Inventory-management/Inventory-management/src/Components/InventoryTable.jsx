@@ -19,10 +19,10 @@ const InventoryTable = () => {
     const fetchData = async () => {
       try {
         const [salesRes, discountsRes] = await Promise.all([
-          axios.get("http://localhost:8000/api/sales/", {
+          axios.get("http://192.168.1.26:8000/api/sales/", {
             headers: { Authorization: `Token ${token}` },
           }),
-          axios.get("http://localhost:8000/api/discounts/", {
+          axios.get("http://192.168.1.26:8000/api/discounts/", {
             headers: { Authorization: `Token ${token}` },
           }),
         ]);

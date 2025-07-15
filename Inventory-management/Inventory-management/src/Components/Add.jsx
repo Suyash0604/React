@@ -23,7 +23,7 @@ const Add = ({ onClose, editableProduct }) => {
     // Fetch suppliers
     const fetchSuppliers = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/suppliers/", {
+        const res = await axios.get("http://192.168.1.26:8000/api/suppliers/", {
           headers: { Authorization: `Token ${token}` },
         });
         setSuppliers(res.data);
@@ -35,7 +35,7 @@ const Add = ({ onClose, editableProduct }) => {
     // Fetch users for owner dropdown
     const fetchUsers = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/users/", {
+        const res = await axios.get("http://192.168.1.26:8000/api/users/", {
           headers: { Authorization: `Token ${token}` },
         });
         setUsers(res.data);

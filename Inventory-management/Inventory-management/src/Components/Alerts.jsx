@@ -25,7 +25,7 @@ const Alerts = () => {
               <div className="text-gray-300 text-sm mt-2">
                 <p><span className="text-white font-medium">SKU:</span> {item.SKU}</p>
                 <p><span className="text-white font-medium">Quantity:</span> {item.Quantity}</p>
-                <p><span className="text-white font-medium">Supplier:</span> {item.supplier}</p>
+                <p><span className="text-white font-medium">Supplier:</span> {item.supplier_name}</p>
                 <p><span className="text-white font-medium">Date:</span> {item.Date}</p>
               </div>
               <p className="text-red-400 font-bold mt-3">⚠️ Low Stock</p>
